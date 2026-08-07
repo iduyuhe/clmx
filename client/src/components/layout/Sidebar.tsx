@@ -4,7 +4,7 @@ import { useAuthStore } from '@/stores/authStore'
 import {
   LayoutDashboard, Factory, Database, Brain, FlaskConical,
   Rocket, Settings, ChevronLeft, ChevronRight, Zap,
-  Cpu, HeartPulse, Wrench
+  Cpu, HeartPulse, Wrench, Boxes
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { roleSatisfies } from '@/lib/role'
@@ -20,6 +20,7 @@ const navItems = [
   { label: '模型推理', icon: Zap, path: '/app/inference' },
   { label: '设备管理', icon: Cpu, path: '/app/devices' },
   { label: '健康看板', icon: HeartPulse, path: '/app/health' },
+  { label: '接入生成器', icon: Boxes, path: '/app/ingest' },
   { label: '维修工单', icon: Wrench, path: '/app/maintenance', minRole: 'MANAGER' as const },
   { label: '系统设置', icon: Settings, path: '/app/settings', minRole: 'ADMIN' as const },
 ]
