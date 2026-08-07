@@ -1,0 +1,51 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Build output
+dist/
+build/
+
+# Uploads & user data
+uploads/
+checkpoints/
+logs/
+*.log
+
+# Database
+*.db
+*.db-journal
+prisma/migrations/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp
+server_tmp/
+.npm-cache/
+.codebuddy/
+.workbuddy/
+outputs/
+
+# Build artifacts (regenerable)
+deploy/*.tar.gz
+server/src/worker/__pycache__/
+
+# Secrets / keys (never commit)
+deploy/deploy_key
+deploy/deploy_key.pub
+
+# Windows reserved
+nul
