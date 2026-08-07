@@ -1,0 +1,4 @@
+[
+  { "nodeId": "ns=2;s=PUMP-001.Temp", "sensorId": "在此填写 CLMX 中对应传感器的 ID" },
+  { "nodeId": "ns=2;s=PUMP-001.Vibration", "sensorId": "在此填写 CLMX 中对应传感器的 ID" }
+]
