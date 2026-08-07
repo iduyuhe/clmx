@@ -25,6 +25,7 @@ import maintenanceRoutes from './modules/maintenance/maintenance.routes'
 import healthRoutes from './modules/health/health.routes'
 import tenantRoutes from './modules/tenant/tenant.routes'
 import ingestRoutes from './modules/ingest/ingest.routes'
+import ingestGeneratorRoutes from './modules/ingest/ingest.generator.routes'
 import notificationRoutes from './modules/notifications/notifications.routes'
 import demoRoutes from './modules/demo/demo.routes'
 import billingRoutes from './modules/billing/billing.routes'
@@ -95,6 +96,7 @@ export function createApp() {
   app.use('/api/health', healthRoutes)
   app.use('/api/tenants', tenantRoutes)
   app.use('/api/ingest', ingestRoutes)
+  app.use('/api/ingest', ingestGeneratorRoutes)
   app.use('/api/notifications', notificationRoutes)
   app.use('/api/demo-data', demoRoutes)
   app.use('/api/billing', billingRoutes)
