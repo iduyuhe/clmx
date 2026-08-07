@@ -309,3 +309,67 @@ export const nlCommandApi = {
   send: (message: string) =>
     apiClient.post<ApiResponse<{ reply: string; action?: string; data?: unknown }>>('/nl-command', { message }).then(unwrap),
 }
+
+// ─── AI 原生接入生成器 + 能力资产化（HubPort 思想融合 阶段5/7） ──
+export interface IngestPointDTO {
+  key: string
+  name: string
+  unit: string
+  type: string
+}
+export interface IngestSpecDTO {
+  id: string
+  tenantId: string | null
+  name: string
+  description: string
+  sourceType: string
+  sourceUrl: string | null
+  rawSpec: string
+  status: string
+  createdAt: string
+  assets?: IngestAssetDTO[]
+}
+export interface IngestAssetDTO {
+  id: string
+  tenantId: string | null
+  specId: string
+  version: number
+  thingModel: string // JSON 字符串
+  driverCode: string
+  sampleData: string | null
+  selfTestResult: string | null
+  status: string
+  published: boolean
+  reuseCount: number
+  createdAt: string
+  spec?: { name: string; sourceType: string; description: string }
+}
+export interface SelfTestDTO {
+  passed: boolean
+  expectedCount: number
+  gotCount: number
+  readings: { key: string; name?: string; unit?: string; value: number }[]
+  missing: string[]
+  errors: string[]
+}
+
+export const ingestApi = {
+  // 接入需求
+  listSpecs: () => apiClient.get<ApiResponse<IngestSpecDTO[]>>('/ingest/specs').then(unwrap),
+  getSpec: (id: string) => apiClient.get<ApiResponse<IngestSpecDTO>>(`/ingest/specs/${id}`).then(unwrap),
+  createSpec: (req: { name: string; description?: string; sourceType?: string; sourceUrl?: string; rawSpec?: string }) =>
+    apiClient.post<ApiResponse<IngestSpecDTO>>('/ingest/specs', req).then(unwrap),
+  // 生成（同步）
+  generate: (id: string) =>
+    apiClient.post<ApiResponse<{ asset: IngestAssetDTO; from: string; points: IngestPointDTO[]; notes: string[]; selfTest: SelfTestDTO }>>(`/ingest/specs/${id}/generate`).then(unwrap),
+  // 自测
+  selfTest: (assetId: string) => apiClient.post<ApiResponse<SelfTestDTO>>(`/ingest/assets/${assetId}/selftest`).then(unwrap),
+  // 运行时执行驱动（可选写 SensorData）
+  run: (assetId: string, req: { deviceId?: string; payload?: Record<string, unknown> }) =>
+    apiClient.post<ApiResponse<{ readings: { key: string; value: number }[]; written: number; deviceId: string | null }>>(`/ingest/assets/${assetId}/run`, req).then(unwrap),
+  // 资产治理
+  publish: (assetId: string) => apiClient.post<ApiResponse<IngestAssetDTO>>(`/ingest/assets/${assetId}/publish`).then(unwrap),
+  deprecate: (assetId: string) => apiClient.post<ApiResponse<IngestAssetDTO>>(`/ingest/assets/${assetId}/deprecate`).then(unwrap),
+  listAssets: (marketplace = false) => apiClient.get<ApiResponse<IngestAssetDTO[]>>(`/ingest/assets${marketplace ? '?marketplace=1' : ''}`).then(unwrap),
+  apply: (assetId: string, deviceId: string) => apiClient.post<ApiResponse<{ deviceId: string; sensors: string[]; count: number }>>(`/ingest/assets/${assetId}/apply`, { deviceId }).then(unwrap),
+}
