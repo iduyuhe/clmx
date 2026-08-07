@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.env
+.env.local
+uploads/
+checkpoints/
+logs/
+*.log
+*.db
+*.db-journal
+.git/
