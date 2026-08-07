@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "tsx watch src/server.ts",
+    "mcp": "tsx src/modules/mcp/mcp.server.ts",
     "build": "prisma generate && tsc",
     "start": "node dist/server.js",
     "db:generate": "prisma generate",
