@@ -27,6 +27,7 @@ import { DeviceWizardPage } from '@/pages/devices/DeviceWizardPage'
 import { DeviceCreatePage } from '@/pages/devices/DeviceCreatePage'
 import { DeviceDetailPage } from '@/pages/devices/DeviceDetailPage'
 import { HealthDashboardPage } from '@/pages/health/HealthDashboardPage'
+import { IngestLibraryPage } from '@/pages/ingest/IngestLibraryPage'
 import { MaintenanceListPage } from '@/pages/maintenance/MaintenanceListPage'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 
@@ -71,6 +72,7 @@ const router = createBrowserRouter([
       { path: 'devices/new', element: <RoleGuard minRole="MANAGER"><DeviceCreatePage /></RoleGuard> },
       { path: 'devices/:deviceId', element: <DeviceDetailPage /> },
       { path: 'health', element: <HealthDashboardPage /> },
+      { path: 'ingest', element: <IngestLibraryPage /> },
       { path: 'maintenance', element: <MaintenanceListPage /> },
     ],
   },
