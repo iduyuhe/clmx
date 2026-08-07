@@ -1,0 +1,481 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id            String   @id @default(cuid())
+  name          String
+  slug          String   @unique
+  industry      String?
+  planType      String   @default("FREE")
+  branding      String?
+  status        String   @default("ACTIVE")
+  storageUsed   BigInt   @default(0)
+  apiCallQuota  BigInt   @default(10000)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  users       User[]
+  industries  Industry[]
+  scenarios   Scenario[]
+  datasets    Dataset[]
+  models      AiModel[]
+  apiKeys     ApiKey[]
+  auditLogs   AuditLog[]
+  devices     Device[]
+  maintenanceOrders MaintenanceOrder[]
+  spareParts  SparePart[]
+  alertRules  AlertRule[]
+  notifications Notification[]
+  alertChannels AlertChannel[]
+  invoices      Invoice[]
+}
+
+model User {
+  id           String   @id @default(cuid())
+  tenantId     String
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         String   @default("ADMIN")
+  status       String   @default("ACTIVE")
+  lastLoginAt  DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tenant      Tenant       @relation(fields: [tenantId], references: [id])
+  annotations Annotation[]
+  auditLogs   AuditLog[]
+}
+
+model Industry {
+  id            String   @id @default(cuid())
+  name          String
+  code          String   @unique
+  description   String?
+  icon          String   @default("factory")
+  isPreset      Boolean  @default(true)
+  tenantId      String?
+  defaultConfig String?
+  createdAt     DateTime @default(now())
+
+  tenant    Tenant?    @relation(fields: [tenantId], references: [id])
+  scenarios Scenario[]
+}
+
+model Scenario {
+  id               String   @id @default(cuid())
+  name             String
+  code             String
+  description      String?
+  industryId       String
+  promptTemplate   String?
+  recommendedParams String?
+  isPreset         Boolean  @default(true)
+  tenantId         String?
+  createdAt        DateTime @default(now())
+
+  industry Industry @relation(fields: [industryId], references: [id])
+  tenant   Tenant?  @relation(fields: [tenantId], references: [id])
+}
+
+model Dataset {
+  id          String   @id @default(cuid())
+  tenantId    String
+  name        String
+  description String?
+  industry    String?
+  scenario    String?
+  format      String   @default("CSV")
+  filePath    String?
+  fileSize    BigInt   @default(0)
+  rowCount    Int      @default(0)
+  status      String   @default("UPLOADING")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant      Tenant        @relation(fields: [tenantId], references: [id])
+  versions    DataVersion[]
+  annotations Annotation[]
+}
+
+model DataVersion {
+  id              String   @id @default(cuid())
+  tenantId        String?
+  datasetId       String
+  versionNumber   Int
+  filePath        String?
+  rowCount        Int      @default(0)
+  parentVersionId String?
+  changeSummary   String?
+  createdAt       DateTime @default(now())
+
+  dataset      Dataset       @relation(fields: [datasetId], references: [id])
+  annotations  Annotation[]
+  trainingJobs TrainingJob[]
+  evaluations  Evaluation[]
+}
+
+model Annotation {
+  id             String   @id @default(cuid())
+  tenantId       String?
+  datasetId      String
+  versionId      String
+  annotatorId    String
+  dataIndex      Int
+  annotationType String
+  annotationData String
+  status         String   @default("PENDING")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  dataset   Dataset     @relation(fields: [datasetId], references: [id])
+  version   DataVersion @relation(fields: [versionId], references: [id])
+  annotator User        @relation(fields: [annotatorId], references: [id])
+}
+
+model AiModel {
+  id          String   @id @default(cuid())
+  tenantId    String
+  name        String
+  description String?
+  industry    String?
+  scenario    String?
+  baseModel   String
+  domain      String   @default("NLP")
+  status      String   @default("DRAFT")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant   Tenant         @relation(fields: [tenantId], references: [id])
+  versions ModelVersion[]
+  jobs     TrainingJob[]
+}
+
+model ModelVersion {
+  id                String   @id @default(cuid())
+  tenantId          String?
+  modelId           String
+  versionNumber     Int
+  checkpointPath    String?
+  trainingJobId     String?
+  metrics           String?
+  evaluationSummary String?
+  interpretation    String?
+  status            String   @default("DRAFT")
+  dataType          String?
+  createdAt         DateTime @default(now())
+
+  model       AiModel      @relation(fields: [modelId], references: [id])
+  evaluations Evaluation[]
+  deployments Deployment[]
+}
+
+model TrainingJob {
+  id                  String    @id @default(cuid())
+  tenantId            String?
+  modelId             String
+  modelVersionId      String?
+  datasetVersionId    String?
+  evalDatasetVersionId String?
+  hyperparams         String
+  status              String    @default("QUEUED")
+  progress            Int       @default(0)
+  currentEpoch        Int       @default(0)
+  totalEpochs         Int       @default(3)
+  gpuType             String    @default("NVIDIA-T4")
+  gpuCount            Int       @default(1)
+  lossHistory         String?
+  startedAt           DateTime?
+  completedAt         DateTime?
+  callbackToken       String?
+  createdAt           DateTime  @default(now())
+
+  model          AiModel     @relation(fields: [modelId], references: [id])
+  datasetVersion DataVersion? @relation(fields: [datasetVersionId], references: [id])
+  logs           TrainingLog[]
+}
+
+model TrainingLog {
+  id            String   @id @default(cuid())
+  tenantId      String?
+  trainingJobId String
+  level         String   @default("INFO")
+  message       String
+  metadata      String?
+  timestamp     DateTime @default(now())
+
+  trainingJob TrainingJob @relation(fields: [trainingJobId], references: [id])
+}
+
+model Evaluation {
+  id               String   @id @default(cuid())
+  tenantId         String?
+  modelVersionId   String
+  datasetVersionId String
+  evalType         String   @default("AUTO")
+  autoMetrics      String?
+  manualScores     String?
+  status           String   @default("PENDING")
+  reportPath       String?
+  createdAt        DateTime @default(now())
+
+  modelVersion  ModelVersion @relation(fields: [modelVersionId], references: [id])
+  datasetVersion DataVersion @relation(fields: [datasetVersionId], references: [id])
+}
+
+model Deployment {
+  id             String   @id @default(cuid())
+  tenantId       String?
+  modelVersionId String
+  name           String
+  endpointUrl    String?
+  status         String   @default("DEPLOYING")
+  instanceCount  Int      @default(1)
+  gpuType        String   @default("NVIDIA-T4")
+  createdAt      DateTime @default(now())
+
+  modelVersion ModelVersion @relation(fields: [modelVersionId], references: [id])
+  apiKeys      ApiKey[]
+  apiUsages    ApiUsage[]
+}
+
+model ApiKey {
+  id           String    @id @default(cuid())
+  tenantId     String
+  deploymentId String
+  keyHash      String
+  keyPreview   String
+  name         String
+  rateLimit    Int       @default(100)
+  isActive     Boolean   @default(true)
+  expiresAt    DateTime?
+  createdAt    DateTime  @default(now())
+
+  tenant     Tenant     @relation(fields: [tenantId], references: [id])
+  deployment Deployment @relation(fields: [deploymentId], references: [id])
+  usages     ApiUsage[]
+}
+
+model ApiUsage {
+  id             String   @id @default(cuid())
+  tenantId       String?
+  apiKeyId       String
+  deploymentId   String
+  requestTokens  Int      @default(0)
+  responseTokens Int      @default(0)
+  latencyMs      Int      @default(0)
+  statusCode     Int      @default(200)
+  timestamp      DateTime @default(now())
+
+  apiKey     ApiKey     @relation(fields: [apiKeyId], references: [id])
+  deployment Deployment @relation(fields: [deploymentId], references: [id])
+}
+
+model AuditLog {
+  id           String   @id @default(cuid())
+  tenantId     String
+  userId       String
+  action       String
+  resourceType String
+  resourceId   String
+  changes      String?
+  ipAddress    String?
+  userAgent    String?
+  createdAt    DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+}
+
+// ─── 工业设备预防性维修模块 ─────────────────────────
+
+model Device {
+  id            String   @id @default(cuid())
+  tenantId      String
+  name          String
+  code          String
+  category      String   @default("other")
+  manufacturer  String?
+  modelNumber   String?
+  location      String?
+  installDate   DateTime?
+  status        String   @default("RUNNING")
+  description   String?
+  lastHealthScore Float?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  tenant      Tenant           @relation(fields: [tenantId], references: [id])
+  sensors     Sensor[]
+  healthScores HealthScore[]
+  maintenanceOrders MaintenanceOrder[]
+}
+
+model Sensor {
+  id            String   @id @default(cuid())
+  tenantId      String?
+  deviceId      String
+  name          String
+  channel       String
+  unit          String   @default("")
+  samplingRate  Int      @default(1)
+  minThreshold  Float?
+  maxThreshold  Float?
+  autoBaseline    Boolean   @default(false)
+  baselineMin     Float?
+  baselineMax     Float?
+  baselineMean    Float?
+  baselineStd     Float?
+  baselineSamples Int?
+  baselineUpdatedAt DateTime?
+  status        String   @default("ACTIVE")
+  createdAt     DateTime @default(now())
+
+  device     Device       @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  dataPoints SensorData[]
+  alertRules AlertRule[]
+}
+
+model SensorData {
+  id         String   @id @default(cuid())
+  tenantId   String?
+  sensorId   String
+  timestamp  DateTime @default(now())
+  value      Float
+  quality    String   @default("GOOD")
+
+  sensor Sensor @relation(fields: [sensorId], references: [id], onDelete: Cascade)
+
+  @@index([sensorId, timestamp])
+}
+
+model HealthScore {
+  id             String   @id @default(cuid())
+  tenantId       String?
+  deviceId       String
+  score          Float
+  level          String   @default("HEALTHY")
+  modelVersionId String?
+  details        String?
+  createdAt      DateTime @default(now())
+
+  device Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  @@index([deviceId, createdAt])
+}
+
+model MaintenanceOrder {
+  id           String   @id @default(cuid())
+  tenantId     String
+  deviceId     String
+  type         String   @default("PREVENTIVE")
+  priority     String   @default("MEDIUM")
+  title        String
+  description  String?
+  status       String   @default("PENDING")
+  assignedTo   String?
+  dueDate      DateTime?
+  completedAt  DateTime?
+  healthScore  Float?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  device Device @relation(fields: [deviceId], references: [id])
+}
+
+model SparePart {
+  id            String   @id @default(cuid())
+  tenantId      String
+  name          String
+  partNumber    String?
+  specification String?
+  stockQty      Int      @default(0)
+  minStock      Int      @default(0)
+  unitPrice     Float    @default(0)
+  supplier      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+}
+
+model AlertRule {
+  id                String   @id @default(cuid())
+  tenantId          String
+  deviceId          String?
+  sensorId          String?
+  name              String
+  ruleType          String   @default("THRESHOLD")
+  condition         String
+  severity          String   @default("WARNING")
+  isEnabled         Boolean  @default(true)
+  lastTriggeredAt   DateTime?
+  createdAt         DateTime @default(now())
+
+  tenant Tenant  @relation(fields: [tenantId], references: [id])
+  sensor  Sensor? @relation(fields: [sensorId], references: [id], onDelete: Cascade)
+}
+
+// 站内信通知（告警投递的 IN_APP 通道）。userId 为 null 表示租户广播，落库时按租户成员 fan-out。
+model Notification {
+  id        String   @id @default(cuid())
+  tenantId  String
+  userId    String?
+  type      String   @default("ALERT") // ALERT / MAINTENANCE / SYSTEM
+  title     String
+  body      String
+  level     String   @default("INFO")   // INFO / WARNING / CRITICAL
+  read      Boolean  @default(false)
+  relatedId String?
+  link      String?
+  createdAt DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, userId, read])
+  @@index([createdAt])
+}
+
+// 租户级外部告警通道（WEBHOOK / 企微群机器人 / 邮件）。IN_APP 为站内信，无需此表。
+model AlertChannel {
+  id        String   @id @default(cuid())
+  tenantId  String
+  type      String   // IN_APP / WEBHOOK / WECHAT / EMAIL
+  name      String
+  config    String   @default("{}") // JSON: {"url":"https://...","secret":"..."}
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, enabled])
+}
+
+// 账单（SaaS 计费生命周期）。状态：DRAFT → OPEN → PAID / VOID。支付为 mock。
+model Invoice {
+  id        String   @id @default(cuid())
+  tenantId  String
+  userId    String
+  number    String   @unique
+  period    String   // 账期，如 2026-07
+  amount    Float
+  currency  String   @default("CNY")
+  status    String   @default("OPEN") // DRAFT / OPEN / PAID / VOID
+  dueDate   DateTime?
+  paidAt    DateTime?
+  items     String   @default("[]") // JSON 数组：[{name, qty, unitPrice, amount}]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId, status])
+}
