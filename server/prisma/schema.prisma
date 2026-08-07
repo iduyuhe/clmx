@@ -479,3 +479,44 @@ model Invoice {
 
   @@index([tenantId, status])
 }
+
+// ─── AI 原生接入生成器（HubPort 思想融合 阶段5/7） ─────────────────
+// 接入需求：用户提交设备描述/协议文档/样本，由生成器产出物模型 + 采集驱动。
+model IngestSpec {
+  id          String   @id @default(cuid())
+  tenantId    String?
+  name        String
+  description String   @default("") // 自然语言 / 协议文档描述（接入需求）
+  sourceType  String   @default("http") // http | mqtt | modbus | opcua | csv | manual
+  sourceUrl   String?  // 对接地址（http 轮询 URL / MQTT broker 等）
+  rawSpec     String   @default("") // 原始摄入内容（结构化 JSON 含 points / 或自由文本）
+  status      String   @default("draft") // draft | generated | published
+  createdBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  assets IngestAsset[]
+
+  @@index([tenantId])
+}
+
+// 接入资产：版本化、可复用、可分发（阶段7 能力资产化）。驱动运行时零 LLM 依赖。
+model IngestAsset {
+  id             String   @id @default(cuid())
+  tenantId       String?
+  specId         String
+  spec           IngestSpec @relation(fields: [specId], references: [id], onDelete: Cascade)
+  version        Int      @default(1)
+  thingModel     String   // JSON：传感器/点位定义数组 [{key,name,unit,type}]
+  driverCode     String   // 生成的零依赖 JS 采集驱动（collect 函数源码）
+  sampleData     String?  // 自测样本（JSON）
+  selfTestResult String?  // 自测结果 JSON {passed,readings,missing,errors}
+  status         String   @default("generated") // generated | verified | published | deprecated
+  published      Boolean  @default(false) // 是否进入资产市场（可跨租户复用）
+  reuseCount     Int      @default(0) // 被复用次数（能力资产厚度指标）
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([specId, version])
+  @@index([tenantId, published])
+}
