@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: "🔒 安全漏洞"
+    url: https://github.com/iduyuhe/clmx/security/advisories/new
+    about: 请勿公开提交安全漏洞，请走私有漏洞报告通道。
+  - name: "💬 商业合作 / 私有化部署"
+    url: https://gitee.com/i4hub/clmx
+    about: 国内镜像与商务咨询。
