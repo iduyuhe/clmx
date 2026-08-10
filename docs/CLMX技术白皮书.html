@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CLMX 技术白皮书 · 面向工业互联网的垂类 AI 模型训练、推理与能力开放平台</title>
+<style>
+  :root{
+    --ink:#0f1b2d; --ink2:#29405e; --muted:#5d7290;
+    --line:#e2e8f1; --bg:#ffffff; --bg2:#f5f8fc; --bg3:#eef3f9;
+    --brand:#1657d6; --brand2:#0aa6b8; --accent:#ff8a3d;
+    --ok:#1b9e6b; --warn:#d98a00; --code:#0b1f3a;
+    --maxw:920px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; color:var(--ink); background:var(--bg2);
+    font-family:"Microsoft YaHei","PingFang SC","Hiragino Sans GB",-apple-system,"Segoe UI",sans-serif;
+    line-height:1.75; font-size:16px; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:var(--maxw); margin:0 auto; background:var(--bg); padding:0 0 80px; box-shadow:0 0 60px rgba(15,27,45,.06)}
+
+  /* ---------- Cover ---------- */
+  .cover{
+    background:linear-gradient(135deg,#0a1f45 0%,#10316b 55%,#0a6f7e 100%);
+    color:#fff; padding:84px 64px 64px; position:relative; overflow:hidden;
+  }
+  .cover::after{
+    content:""; position:absolute; right:-80px; top:-80px; width:320px; height:320px;
+    border:1px solid rgba(255,255,255,.12); border-radius:50%;
+  }
+  .cover::before{
+    content:""; position:absolute; right:-30px; top:-30px; width:200px; height:200px;
+    border:1px solid rgba(255,255,255,.16); border-radius:50%;
+  }
+  .cover .kicker{font-size:13px; letter-spacing:3px; color:#9fd6e0; text-transform:uppercase}
+  .cover h1{font-size:42px; margin:14px 0 6px; font-weight:800; letter-spacing:.5px}
+  .cover .sub{font-size:18px; color:#cfe0f5; font-weight:400; max-width:660px}
+  .cover .meta{margin-top:38px; display:flex; flex-wrap:wrap; gap:14px 30px; font-size:13.5px; color:#bcd0ea}
+  .cover .meta b{color:#fff; font-weight:600}
+  .badges{margin-top:26px; display:flex; flex-wrap:wrap; gap:10px}
+  .badge{background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.18); color:#eaf2ff;
+    padding:5px 12px; border-radius:999px; font-size:12.5px}
+
+  /* ---------- TOC ---------- */
+  .toc{padding:38px 64px 8px}
+  .toc h2{font-size:14px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin:0 0 14px}
+  .toc ol{margin:0; padding-left:20px; columns:2; column-gap:40px}
+  .toc li{margin:5px 0; break-inside:avoid}
+  .toc a{color:var(--brand); text-decoration:none}
+  .toc a:hover{text-decoration:underline}
+
+  /* ---------- Content ---------- */
+  .body{padding:10px 64px 0}
+  section{padding:26px 0; border-top:1px solid var(--line)}
+  section:first-of-type{border-top:none}
+  h2.sec{font-size:25px; margin:0 0 6px; color:var(--ink); display:flex; align-items:baseline; gap:12px}
+  h2.sec .num{color:var(--brand); font-weight:800; font-size:22px}
+  h3{font-size:18px; margin:26px 0 8px; color:var(--ink2)}
+  h4{font-size:15px; margin:18px 0 6px; color:var(--brand2); font-weight:700}
+  p{margin:10px 0}
+  ul,ol{padding-left:22px}
+  li{margin:6px 0}
+  a{color:var(--brand)}
+  strong{color:var(--ink)}
+  .lead{font-size:17px; color:var(--ink2)}
+
+  .callout{border-left:4px solid var(--brand); background:var(--bg2); padding:14px 18px; margin:16px 0; border-radius:0 8px 8px 0}
+  .callout.warn{border-color:var(--warn); background:#fff8ec}
+  .callout.ok{border-color:var(--ok); background:#eefaf3}
+  .callout b{color:var(--ink)}
+
+  code{font-family:"Cascadia Code","Consolas","SFMono-Regular",monospace; font-size:13.5px;
+    background:var(--bg3); padding:1px 6px; border-radius:5px; color:#9a2b4a}
+  pre{background:var(--code); color:#e6edf6; padding:16px 18px; border-radius:10px; overflow:auto; font-size:13px; line-height:1.6}
+  pre code{background:none; color:inherit; padding:0}
+  .c-key{color:#7fd1ff} .c-str{color:#9be6a8} .c-com{color:#6b8099} .c-fn{color:#ffd479}
+
+  table{border-collapse:collapse; width:100%; margin:16px 0; font-size:14.5px}
+  th,td{border:1px solid var(--line); padding:9px 12px; text-align:left; vertical-align:top}
+  th{background:var(--bg3); color:var(--ink2); font-weight:700}
+  tr:nth-child(even) td{background:var(--bg2)}
+
+  .fig{margin:22px 0; text-align:center}
+  .fig svg{max-width:100%; height:auto}
+  .fig .cap{font-size:13px; color:var(--muted); margin-top:8px}
+
+  .grid{display:grid; gap:14px; margin:16px 0}
+  .grid.c2{grid-template-columns:1fr 1fr}
+  .grid.c3{grid-template-columns:repeat(3,1fr)}
+  .card{border:1px solid var(--line); border-radius:12px; padding:16px 18px; background:var(--bg)}
+  .card h4{margin-top:0; color:var(--brand)}
+  .card .ic{font-size:22px}
+  .stat{display:flex; gap:22px; flex-wrap:wrap; margin:18px 0}
+  .stat .s{border:1px solid var(--line); border-radius:12px; padding:14px 20px; min-width:120px; text-align:center; background:var(--bg2)}
+  .stat .s .n{font-size:30px; font-weight:800; color:var(--brand)}
+  .stat .s .l{font-size:13px; color:var(--muted)}
+
+  footer{padding:34px 64px; color:var(--muted); font-size:13px; border-top:1px solid var(--line); margin-top:20px}
+  footer a{color:var(--brand)}
+
+  @media print{
+    body{background:#fff} .wrap{box-shadow:none; max-width:none}
+    .cover{-webkit-print-color-adjust:exact; print-color-adjust:exact}
+    section{page-break-inside:avoid} pre,.fig{page-break-inside:avoid}
+    .toc{display:none}
+    a{color:var(--ink); text-decoration:none}
+  }
+  @media (max-width:680px){
+    .cover,.toc,.body,footer{padding-left:22px; padding-right:22px}
+    .cover h1{font-size:30px} .toc ol{columns:1}
+    .grid.c2,.grid.c3{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ COVER ============ -->
+  <div class="cover">
+    <div class="kicker">Technical White Paper</div>
+    <h1>CLMX 技术白皮书</h1>
+    <div class="sub">面向工业互联网的垂类 AI 模型训练、推理与能力开放平台<br>
+      ——把"训练一个模型"升级为"运营一座模型工厂"</div>
+    <div class="meta">
+      <div><b>版本</b> v1.0（对应平台阶段 0–7）</div>
+      <div><b>发布日期</b> 2026-08-10</div>
+      <div><b>许可协议</b> MIT Open Source</div>
+      <div><b>维护团队</b> CLMX Authors</div>
+    </div>
+    <div class="badges">
+      <span class="badge">模型工厂</span>
+      <span class="badge">半智能体闭环</span>
+      <span class="badge">AI 原生接入生成器</span>
+      <span class="badge">北向 MCP 开放</span>
+      <span class="badge">零依赖边缘推理</span>
+      <span class="badge">多租户 SaaS</span>
+    </div>
+  </div>
+
+  <!-- ============ TOC ============ -->
+  <nav class="toc">
+    <h2>目录</h2>
+    <ol>
+      <li><a href="#s1">摘要</a></li>
+      <li><a href="#s2">背景与行业挑战</a></li>
+      <li><a href="#s3">平台定位与设计哲学</a></li>
+      <li><a href="#s4">整体架构</a></li>
+      <li><a href="#s5">核心能力一：半智能体闭环</a></li>
+      <li><a href="#s6">核心能力二：AI 原生接入生成器</a></li>
+      <li><a href="#s7">核心能力三：北向 MCP 能力开放</a></li>
+      <li><a href="#s8">核心能力四：多租户 SaaS 底座</a></li>
+      <li><a href="#s9">机器学习管线</a></li>
+      <li><a href="#s10">数据模型概览</a></li>
+      <li><a href="#s11">关键技术决策与权衡</a></li>
+      <li><a href="#s12">安全与合规</a></li>
+      <li><a href="#s13">开源与社区生态</a></li>
+      <li><a href="#s14">发展路线图</a></li>
+      <li><a href="#s15">结语</a></li>
+      <li><a href="#app">附录：术语表与资源</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ BODY ============ -->
+  <div class="body">
+
+    <!-- 1 -->
+    <section id="s1">
+      <h2 class="sec"><span class="num">01</span>摘要</h2>
+      <p class="lead">CLMX 是一套面向工业互联网的<strong>垂类 AI 模型训练、推理与能力开放平台</strong>。它把"为某台设备训练一个异常检测模型"这一手工作坊式任务，抽象为一套可复用、可编排、可对外开放的<strong>模型工厂</strong>。</p>
+      <p>平台以"工业设备预测性维修"为首个落地外壳，但底座是一套通用的<strong>模型生产与运营系统</strong>：内置无监督时序异常检测、零依赖中文文本分类两类训练-推理同构引擎，并围绕"让平台自身具备一定智能"的目标，落地了<strong>半智能体闭环</strong>（自然语言交互 → 自动基线 → 异常自动处置 → 训练结果自动解读）。</p>
+      <p>在接入侧，CLMX 引入 <strong>AI 原生接入生成器</strong>：从设备文档/样本/描述自动抽取测点、生成物模型与零依赖采集驱动，并就地自测；在开放侧，CLMX 以<strong>北向 MCP（Model Context Protocol）能力底座</strong>把既有 API 封装为 10 个可被外部 AI 智能体直接编排的工具。两个方向共同支撑"护城河"——<strong>训练-推理同构 + 零依赖边缘 JS 推理</strong>，使模型无需深度学习框架即可在边缘运行。</p>
+      <p>本白皮书阐述 CLMX 的定位、架构、四大核心能力、机器学习管线、关键技术决策、安全模型与开源路线，供技术决策者、集成商与贡献者参考。</p>
+    </section>
+
+    <!-- 2 -->
+    <section id="s2">
+      <h2 class="sec"><span class="num">02</span>背景与行业挑战</h2>
+      <h3>2.1 工业预测性维修的痛点</h3>
+      <p>工业设备的非计划停机代价高昂。传统"定期保养"要么过度维护、要么漏检。用数据驱动的方式做预测性维修（PdM）是公认方向，但落地长期卡在四道坎：</p>
+      <div class="grid c2">
+        <div class="card"><div class="ic">🧩</div><h4>接入即地狱</h4><p>不同品牌、协议、点位命名千差万别。每接一台设备都要写一遍采集驱动与物模型，工程量大、易出错、难复用。</p></div>
+        <div class="card"><div class="ic">🏷️</div><h4>标注稀缺</h4><p>异常样本极少且代价高。监督学习在工厂现场几乎拿不到足量标注，模型还没训练就已"饿死"。</p></div>
+        <div class="card"><div class="ic">🖥️</div><h4>边缘跑不动</h4><p>深度学习框架体积大、依赖重，难以部署到网关/边缘节点；而把推理全压回中心又带来时延与带宽问题。</p></div>
+        <div class="card"><div class="ic">🧱</div><h4>平台不智能</h4><p>多数工具只是"仪表盘 + 阈值告警"，告警出来仍要人去理解、去处置、去复盘，平台本身不参与决策闭环。</p></div>
+      </div>
+
+      <h3>2.2 现有方案的三大短板</h3>
+      <ul>
+        <li><strong>偏向"单个模型"而非"模型生产体系"</strong>：多数 PdM 方案交付的是一个训练好的模型，缺乏把建模过程产品化、可重复、可运营的能力。</li>
+        <li><strong>偏向"挂个问答机器人"而非"能力开放"</strong>：把 AI 等同于聊天入口，没有把平台能力以标准化协议对外开放，难以被外部智能体编排。</li>
+        <li><strong>重中心、轻边缘</strong>：推理强依赖中心侧 GPU/框架，边缘侧只能做透传，失去"就近智能"的弹性。</li>
+      </ul>
+      <div class="callout">CLMX 的设计出发点，不是再做一只"更聪明的仪表盘"，而是把上述四道坎一次性工程化消化：接入自动生成、训练免标注、推理零依赖、平台半自主。</div>
+    </section>
+
+    <!-- 3 -->
+    <section id="s3">
+      <h2 class="sec"><span class="num">03</span>平台定位与设计哲学</h2>
+      <h3>3.1 CLMX 是什么：模型工厂，而非单个模型</h3>
+      <p>一个容易混淆的概念需要厘清：</p>
+      <table>
+        <tr><th>概念</th><th>是什么</th><th>CLMX 的角色</th></tr>
+        <tr><td><strong>垂类模型</strong></td><td>针对某场景训练出的一个具体模型（如空压机振动异常检测）</td><td>CLMX <em>产出</em> 的对象</td></tr>
+        <tr><td><strong>智能体（Agent）</strong></td><td>调用模型自主完成任务的角色</td><td>CLMX 的<em>使用者 / 编排者</em></td></tr>
+        <tr><td><strong>CLMX</strong></td><td>模型工厂 + 推理服务 + 能力开放平台</td><td>训练、托管、开放模型的<em>底座</em></td></tr>
+      </table>
+      <p>对外话术："<strong>面向工业互联网的垂类 AI 模型训练与推理平台</strong>"。平台生产垂类模型，智能体调用模型——二者通过北向 MCP 衔接。</p>
+
+      <h3>3.2 核心设计原则</h3>
+      <div class="grid c3">
+        <div class="card"><h4>零依赖优先</h4><p>尽可能用纯 JS / 标准库实现训练与推理，避免引入重型框架，保证边缘可跑、依赖可控。</p></div>
+        <div class="card"><h4>训推同构</h4><p>训练与推理使用同一套代码与数值逻辑，消除"训练用 Python、上线用另一套"的偏差与维护成本。</p></div>
+        <div class="card"><h4>多租户隔离</h4><p>行级数据隔离，所有 CRUD 强制带 <code>tenantId</code>，平台即服务（SaaS）交付。</p></div>
+      </div>
+
+      <h3>3.3 HubPort 思想融合</h3>
+      <p>CLMX 评估了"HubPort（AI 原生物联网平台）"的思想，结论为<strong>融思想、不搬产品</strong>。采纳其四个核心思想，并明确不学之处：</p>
+      <table>
+        <tr><th>思想</th><th>采纳（落到 CLMX）</th></tr>
+        <tr><td>T1 · AI 原生接入</td><td>接入生成器：文档/描述 → 自动生成物模型 + 采集驱动 + 自测</td></tr>
+        <tr><td>T2 · 创建时 AI、运行时零 AI</td><td>驱动在"创建时"由 AI/启发式生成，运行时纯 JS 零依赖执行（与护城河同构）</td></tr>
+        <tr><td>T3 · 能力资产化</td><td>IngestSpec / IngestAsset 模型 + 发布市场 + 一键复用（reuseCount）</td></tr>
+        <tr><td>T4 · 北向开放</td><td>自实现 MCP 底座，把平台 API 封装为 10 个标准工具供外部智能体编排</td></tr>
+      </table>
+      <div class="callout warn"><b>红线：</b>"AI 原生 ≠ 挂个问答机器人"。CLMX 不学 HubPort 的产品广度（680+ 功能/全栈 IoT）、多语言运行时（保持零依赖 JS）、受控 CLI 直跑 shell（选 MCP 标准协议替代）。</div>
+    </section>
+
+    <!-- 4 -->
+    <section id="s4">
+      <h2 class="sec"><span class="num">04</span>整体架构</h2>
+      <p>CLMX 采用前后端分离、分层清晰的服务架构。后端以 Express + Prisma 提供服务，前端以 React + TypeScript + Tailwind 构建；接入层同时支持 MQTT（aedes）与 AI 原生接入端点；模型层由 Python worker（CPU 模式）承担训练，推理则下沉到零依赖 JS。</p>
+
+      <div class="fig">
+        <svg viewBox="0 0 820 430" xmlns="http://www.w3.org/2000/svg" font-family="Microsoft YaHei, sans-serif">
+          <defs>
+            <linearGradient id="g1" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1657d6"/><stop offset="1" stop-color="#0aa6b8"/></linearGradient>
+            <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#7c93b3"/></marker>
+          </defs>
+          <!-- layers -->
+          <rect x="20" y="20" width="780" height="64" rx="10" fill="#0a1f45"/>
+          <text x="40" y="48" fill="#cfe0f5" font-size="14" font-weight="700">表示层 / 交互入口</text>
+          <text x="40" y="70" fill="#9fd6e0" font-size="12.5">React + TS + Tailwind 控制台 · 自然语言交互入口 · 资产市场 UI · 侧边栏「接入生成器」</text>
+
+          <rect x="20" y="98" width="780" height="74" rx="10" fill="#10316b"/>
+          <text x="40" y="124" fill="#fff" font-size="14" font-weight="700">平台服务层（Express + Prisma + PostgreSQL）</text>
+          <text x="40" y="146" fill="#bcd0ea" font-size="12.5">认证/RBAC · 设备/模型/训练/告警域 · 半智能体编排 · 多租户行级隔离 · 北向 MCP 服务（JSON-RPC 零依赖）</text>
+
+          <rect x="20" y="186" width="780" height="70" rx="10" fill="#0a6f7e"/>
+          <text x="40" y="212" fill="#fff" font-size="14" font-weight="700">接入与生成层</text>
+          <text x="40" y="234" fill="#d7f3f7" font-size="12.5">MQTT/aedes 遥测端点 · AI 原生接入生成器（测点抽取→物模型→零依赖驱动→沙箱自测）· 运行时采集写 SensorData</text>
+
+          <rect x="20" y="270" width="780" height="64" rx="10" fill="#3a4a63"/>
+          <text x="40" y="296" fill="#fff" font-size="14" font-weight="700">模型层</text>
+          <text x="40" y="318" fill="#d4dceb" font-size="12.5">Python worker（child_process，CPU 模式）训练 · 无监督异常检测 · 零依赖朴素贝叶斯 NLP · 训练-推理同构</text>
+
+          <rect x="20" y="348" width="780" height="58" rx="10" fill="#1b9e6b"/>
+          <text x="40" y="374" fill="#fff" font-size="14" font-weight="700">数据与边缘层</text>
+          <text x="40" y="396" fill="#d3f3e3" font-size="12.5">PostgreSQL（生产）/ SQLite（开发）· 边缘节点零依赖 JS 推理 · 健康分 &lt; 60 自动推送告警</text>
+
+          <!-- vertical arrows -->
+          <line x1="410" y1="84" x2="410" y2="98" stroke="#7c93b3" stroke-width="2" marker-end="url(#ar)"/>
+          <line x1="410" y1="172" x2="410" y2="186" stroke="#7c93b3" stroke-width="2" marker-end="url(#ar)"/>
+          <line x1="410" y1="256" x2="410" y2="270" stroke="#7c93b3" stroke-width="2" marker-end="url(#ar)"/>
+          <line x1="410" y1="334" x2="410" y2="348" stroke="#7c93b3" stroke-width="2" marker-end="url(#ar)"/>
+          <text x="690" y="92" fill="#5d7290" font-size="11.5">请求下行</text>
+          <text x="690" y="280" fill="#5d7290" font-size="11.5">数据/事件上行</text>
+        </svg>
+        <div class="cap">图 1 · CLMX 分层架构（自顶向下：交互 → 平台服务 → 接入生成 → 模型 → 数据与边缘）</div>
+      </div>
+
+      <h3>4.1 技术栈</h3>
+      <table>
+        <tr><th>层</th><th>选型</th><th>说明</th></tr>
+        <tr><td>前端</td><td>React + TypeScript + Tailwind + Vite</td><td>控制台、资产市场、接入生成器 UI；API 统一 <code>client/src/api</code> 解包</td></tr>
+        <tr><td>后端</td><td>Express + Prisma</td><td>模块化 <code>server/src/modules/&lt;name&gt;</code>；响应 <code>{success,data,message}</code></td></tr>
+        <tr><td>数据库</td><td>PostgreSQL（生产）/ SQLite（开发）</td><td>开发期零依赖，生产切 PG；Json 字段以 String 存储</td></tr>
+        <tr><td>接入</td><td>MQTT（aedes）/ HTTP 遥测 / 接入生成端点</td><td><code>/api/ingest</code> 与 <code>/telemetry</code> 共存</td></tr>
+        <tr><td>训练</td><td>Python worker（child_process，CPU）</td><td>无监督异常检测；不依赖深度学习框架</td></tr>
+        <tr><td>推理</td><td>零依赖 JavaScript</td><td>边缘可跑，训推同构</td></tr>
+        <tr><td>开放</td><td>自实现 MCP（JSON-RPC 2.0 over NDJSON）</td><td>stdio 传输，日志走 stderr，零第三方 SDK</td></tr>
+      </table>
+      <div class="stat">
+        <div class="s"><div class="n">10</div><div class="l">MCP 工具</div></div>
+        <div class="s"><div class="n">0</div><div class="l">推理框架依赖</div></div>
+        <div class="s"><div class="n">7</div><div class="l">发展阶段（0–7）</div></div>
+        <div class="s"><div class="n">2</div><div class="l">内置 ML 引擎</div></div>
+      </div>
+    </section>
+
+    <!-- 5 -->
+    <section id="s5">
+      <h2 class="sec"><span class="num">05</span>核心能力一：半智能体闭环</h2>
+      <p>CLMX 把自身智能化成熟度目标定在<strong>第 3 档"半智能体"</strong>：具备感知—决策—处置闭环，但不做全自主智能体（会与零依赖边缘底座冲突）。四项能力协同形成闭环：</p>
+      <div class="fig">
+        <svg viewBox="0 0 760 230" xmlns="http://www.w3.org/2000/svg" font-family="Microsoft YaHei, sans-serif">
+          <defs><marker id="ar2" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1657d6"/></marker></defs>
+          <rect x="20" y="80" width="160" height="70" rx="10" fill="#1657d6"/>
+          <text x="100" y="112" fill="#fff" font-size="13.5" font-weight="700" text-anchor="middle">自然语言</text>
+          <text x="100" y="132" fill="#cfe0f5" font-size="11.5" text-anchor="middle">交互入口</text>
+          <rect x="210" y="80" width="160" height="70" rx="10" fill="#0aa6b8"/>
+          <text x="290" y="112" fill="#fff" font-size="13.5" font-weight="700" text-anchor="middle">自动基线</text>
+          <text x="290" y="132" fill="#d7f3f7" font-size="11.5" text-anchor="middle">健康分/阈值</text>
+          <rect x="400" y="80" width="160" height="70" rx="10" fill="#ff8a3d"/>
+          <text x="480" y="112" fill="#fff" font-size="13.5" font-weight="700" text-anchor="middle">异常处置</text>
+          <text x="480" y="132" fill="#fff1e6" font-size="11.5" text-anchor="middle">闭环（核心）</text>
+          <rect x="590" y="80" width="150" height="70" rx="10" fill="#1b9e6b"/>
+          <text x="665" y="112" fill="#fff" font-size="13.5" font-weight="700" text-anchor="middle">训练解读</text>
+          <text x="665" y="132" fill="#d3f3e3" font-size="11.5" text-anchor="middle">自动出报告</text>
+          <line x1="180" y1="115" x2="208" y2="115" stroke="#1657d6" stroke-width="2.5" marker-end="url(#ar2)"/>
+          <line x1="370" y1="115" x2="398" y2="115" stroke="#0aa6b8" stroke-width="2.5" marker-end="url(#ar2)"/>
+          <line x1="560" y1="115" x2="588" y2="115" stroke="#ff8a3d" stroke-width="2.5" marker-end="url(#ar2)"/>
+          <path d="M665 80 C 700 30, 60 30, 100 80" fill="none" stroke="#1b9e6b" stroke-width="2.5" marker-end="url(#ar2)"/>
+          <text x="380" y="205" fill="#5d7290" font-size="12" text-anchor="middle">闭环：解读结果反哺基线策略，持续自适应</text>
+        </svg>
+        <div class="cap">图 2 · 半智能体闭环：自然语言入口 → 自动基线 → 异常处置（核心）→ 训练解读</div>
+      </div>
+      <h4>① 自然语言交互入口</h4>
+      <p>把"看板操作"升级为"语言操作"。用户用中文描述意图（如"给 1 号冷却水泵生成上周健康分"），平台解析后调用对应能力。该入口同时经北向 MCP 暴露为 <code>clmx_nl_command</code>，便于外部智能体复用。</p>
+      <h4>② 自动基线与健康评分</h4>
+      <p>平台基于历史数据自动计算各测点的基线与健康分，告警阈值不再是人工拍脑袋。健康分 &lt; 60 时通过 Notification + AlertChannel 自动推送，无需人工盯盘。</p>
+      <h4>③ 异常自动处置闭环（核心）</h4>
+      <p>检测到异常后，平台可自动触发处置动作链（通知、派单、联动、必要时触发再训练），形成"感知—决策—处置"闭环。这是 CLMX 区别于"仪表盘 + 阈值"的关键。</p>
+      <h4>④ 训练结果自动解读</h4>
+      <p>训练/推理结束后，平台自动产出可读解读（指标、异常区间、建议），降低使用门槛，也让闭环可解释、可审计。</p>
+      <div class="callout ok">半智能体并不追求"完全自主"。它在人设定的边界内闭环运转，把重复、可程序化的决策交给平台，把价值判断留给用户——这正是工业场景所需的可控智能。</div>
+    </section>
+
+    <!-- 6 -->
+    <section id="s6">
+      <h2 class="sec"><span class="num">06</span>核心能力二：AI 原生接入生成器</h2>
+      <h3>6.1 痛点：接入即地狱</h3>
+      <p>工业现场每接一台设备，都要人工写采集驱动、定义物模型、对齐点位命名。CLMX 的接入生成器把这一过程自动化：</p>
+      <div class="fig">
+        <svg viewBox="0 0 800 120" xmlns="http://www.w3.org/2000/svg" font-family="Microsoft YaHei, sans-serif">
+          <defs><marker id="ar3" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#0aa6b8"/></marker></defs>
+          <rect x="10" y="40" width="120" height="48" rx="8" fill="#10316b"/><text x="70" y="69" fill="#fff" font-size="12" text-anchor="middle">设备文档/样本/描述</text>
+          <rect x="160" y="40" width="120" height="48" rx="8" fill="#0aa6b8"/><text x="220" y="69" fill="#fff" font-size="12" text-anchor="middle">测点抽取</text>
+          <rect x="310" y="40" width="120" height="48" rx="8" fill="#0aa6b8"/><text x="370" y="69" fill="#fff" font-size="12" text-anchor="middle">物模型生成</text>
+          <rect x="460" y="40" width="120" height="48" rx="8" fill="#0aa6b8"/><text x="520" y="69" fill="#fff" font-size="12" text-anchor="middle">零依赖驱动生成</text>
+          <rect x="610" y="40" width="120" height="48" rx="8" fill="#1b9e6b"/><text x="670" y="69" fill="#fff" font-size="12" text-anchor="middle">沙箱自测→运行</text>
+          <line x1="130" y1="64" x2="158" y2="64" stroke="#0aa6b8" stroke-width="2.5" marker-end="url(#ar3)"/>
+          <line x1="280" y1="64" x2="308" y2="64" stroke="#0aa6b8" stroke-width="2.5" marker-end="url(#ar3)"/>
+          <line x1="430" y1="64" x2="458" y2="64" stroke="#0aa6b8" stroke-width="2.5" marker-end="url(#ar3)"/>
+          <line x1="580" y1="64" x2="608" y2="64" stroke="#1b9e6b" stroke-width="2.5" marker-end="url(#ar3)"/>
+        </svg>
+        <div class="cap">图 3 · 接入生成器流水线：从非结构化输入到可运行、可复用资产</div>
+      </div>
+
+      <h3>6.2 测点提取优先级</h3>
+      <p>生成器按可信度从高到低尝试，命中即停：</p>
+      <ol>
+        <li><strong>结构化 JSON</strong>：直接解析点位定义；</li>
+        <li><strong>样本数据推断</strong>：从采集样本反推测点类型与单位；</li>
+        <li><strong>描述启发式词典</strong>：用"温度/压力/振动/转速/电流"等中文工业词典从文本抽取；</li>
+        <li><strong>可选 LLM（env 门控）</strong>：仅在配置 LLM 密钥时启用，且不引入任何 npm 依赖，纯 HTTP 调用。</li>
+      </ol>
+      <h3>6.3 物模型与零依赖驱动生成</h3>
+      <p>提取出测点后，生成标准<strong>物模型</strong>与一段零依赖 JavaScript 采集驱动 <code>collect(ctx)</code>。驱动在"创建时"由 AI/启发式生成，在"运行时"以纯 JS 执行——这正是 HubPort T2 思想的落地：创建时 AI，运行时零 AI。</p>
+      <h3>6.4 沙箱自测与运行时</h3>
+      <p>生成后用 <code>new Function</code> 沙箱执行驱动，验证其产出有限数值；通过后即可发布到资产市场。运行时端点接收驱动并执行，将结果写入 <code>SensorData</code>，与既有 MQTT 遥测端点共存于 <code>/api/ingest</code>。</p>
+      <h4>代码片段：生成的采集驱动示例</h4>
+      <pre><code><span class="c-com">// 由接入生成器产出（零依赖，运行时纯 JS 执行）</span>
+<span class="c-key">function</span> <span class="c-fn">collect</span>(ctx) {
+  <span class="c-key">const</span> t = Date.now();
+  <span class="c-key">return</span> [
+    { point: <span class="c-str">'temperature'</span>, value: <span class="c-fn">sim</span>(ctx, <span class="c-str">'temperature'</span>, 65, 8), ts: t },
+    { point: <span class="c-str">'vibration'</span>,  value: <span class="c-fn">sim</span>(ctx, <span class="c-str">'vibration'</span>,  2.3, 0.6), ts: t },
+    { point: <span class="c-str">'current'</span>,    value: <span class="c-fn">sim</span>(ctx, <span class="c-str">'current'</span>,   12, 1.5), ts: t }
+  ];
+}</code></pre>
+      <div class="callout">资产化：生成结果沉淀为 <code>IngestSpec</code>（需求草稿）/ <code>IngestAsset</code>（版本链，<code>unique(specId, version)</code>，含 <code>published</code>、<code>reuseCount</code>、<code>driverCode</code>、<code>thingModel</code>）。一键 <code>apply</code> 即可为设备自动建立传感器并投入运行。</div>
+    </section>
+
+    <!-- 7 -->
+    <section id="s7">
+      <h2 class="sec"><span class="num">07</span>核心能力三：北向 MCP 能力开放</h2>
+      <h3>7.1 为什么是 MCP</h3>
+      <p>平台的真正价值在于"被使用"。CLMX 选择 <strong>MCP（Model Context Protocol）</strong>作为北向开放标准，而非自建 CLI 直跑 shell——外部 AI 智能体可据此直接编排 CLMX 能力，平台从"被点击"升级为"被编排"。</p>
+      <h3>7.2 零依赖 JSON-RPC 实现</h3>
+      <p>MCP 服务自实现 <strong>JSON-RPC 2.0 over NDJSON</strong>（不引入官方 SDK），stdio 传输，日志走 stderr 以免污染协议流。鉴权支持 <code>CLMX_API_TOKEN</code> 直传或 <code>CLMX_API_EMAIL/PASSWORD</code> 自动登录。退出逻辑为"输入流关闭后等待在途请求完成再退出"，保证不丢请求。</p>
+      <h4>代码片段：MCP 工具清单（节选）</h4>
+      <pre><code><span class="c-com">// server/src/modules/mcp/tools.ts</span>
+<span class="c-key">export const</span> TOOLS = [
+  { name: <span class="c-str">'clmx_nl_command'</span>,       desc: <span class="c-str">'自然语言指令入口'</span> },
+  { name: <span class="c-str">'clmx_list_devices'</span>,     desc: <span class="c-str">'列出设备'</span> },
+  { name: <span class="c-str">'clmx_device_detail'</span>,   desc: <span class="c-str">'设备详情'</span> },
+  { name: <span class="c-str">'clmx_health_dashboard'</span>,desc: <span class="c-str">'健康看板'</span> },
+  { name: <span class="c-str">'clmx_calculate_health'</span>,desc: <span class="c-str">'计算健康分'</span>, role: <span class="c-str">'MANAGER'</span> },
+  { name: <span class="c-str">'clmx_list_training'</span>,   desc: <span class="c-str">'训练任务列表'</span> },
+  { name: <span class="c-str">'clmx_trigger_training'</span>,desc:<span class="c-str">'触发训练'</span>, role: <span class="c-str">'MANAGER'</span> },
+  { name: <span class="c-str">'clmx_run_inference'</span>,   desc: <span class="c-str">'执行推理'</span>, role: <span class="c-str">'MANAGER'</span> },
+  { name: <span class="c-str">'clmx_keywords'</span>,        desc: <span class="c-str">'中文关键词提取'</span> },
+  { name: <span class="c-str">'clmx_list_alert_rules'</span>,desc:<span class="c-str">'告警规则'</span> },
+];</code></pre>
+      <h3>7.3 10 个工具清单</h3>
+      <table>
+        <tr><th>工具</th><th>能力</th><th>权限</th></tr>
+        <tr><td><code>clmx_nl_command</code></td><td>自然语言指令统一入口</td><td>任意</td></tr>
+        <tr><td><code>clmx_list_devices</code></td><td>列出租户下设备</td><td>任意</td></tr>
+        <tr><td><code>clmx_device_detail</code></td><td>单设备详情与测点</td><td>任意</td></tr>
+        <tr><td><code>clmx_health_dashboard</code></td><td>设备健康总览</td><td>任意</td></tr>
+        <tr><td><code>clmx_calculate_health</code></td><td>按需计算健康分</td><td>MANAGER</td></tr>
+        <tr><td><code>clmx_list_training</code></td><td>训练任务列表</td><td>任意</td></tr>
+        <tr><td><code>clmx_trigger_training</code></td><td>触发模型训练</td><td>MANAGER</td></tr>
+        <tr><td><code>clmx_run_inference</code></td><td>执行模型推理</td><td>MANAGER</td></tr>
+        <tr><td><code>clmx_keywords</code></td><td>中文关键词/文本分类</td><td>任意</td></tr>
+        <tr><td><code>clmx_list_alert_rules</code></td><td>告警规则查询</td><td>任意</td></tr>
+      </table>
+      <h4>调用示例（初始化 → 列设备）</h4>
+      <pre><code><span class="c-com"># stdin（NDJSON，每行一个 JSON-RPC 请求）</span>
+{<span class="c-str">"jsonrpc"</span>:<span class="c-str">"2.0"</span>,<span class="c-str">"id"</span>:1,<span class="c-str">"method"</span>:<span class="c-str">"initialize"</span>,<span class="c-str">"params"</span>:{<span class="c-str">"protocolVersion"</span>:<span class="c-str">"2024-11-05"</span>,<span class="c-str">"capabilities"</span>:{}}}
+{<span class="c-str">"jsonrpc"</span>:<span class="c-str">"2.0"</span>,<span class="c-str">"id"</span>:2,<span class="c-str">"method"</span>:<span class="c-str">"tools/call"</span>,<span class="c-str">"params"</span>:{<span class="c-str">"name"</span>:<span class="c-str">"clmx_list_devices"</span>,<span class="c-str">"arguments"</span>:{}}}</code></pre>
+      <p>协议层已通过 <code>tsc</code> 类型检查与协议冒烟测试。</p>
+    </section>
+
+    <!-- 8 -->
+    <section id="s8">
+      <h2 class="sec"><span class="num">08</span>核心能力四：多租户 SaaS 底座</h2>
+      <p>CLMX 以"平台即服务"方式交付，所有数据按租户隔离。</p>
+      <h4>行级隔离（不可违反的约束）</h4>
+      <ul>
+        <li>所有 CRUD 的 <code>where</code> 必含 <code>tenantId: req.tenantId</code>；</li>
+        <li>操作子资源时先联查父资源验归属，杜绝越权；</li>
+        <li><code>req.tenantId</code> / <code>req.userRole</code> 由 <code>authMiddleware</code> 从 JWT 注入；</li>
+        <li>预置数据 <code>tenantId: null</code>，查询时用 <code>OR [tenantId=?, tenantId=null]</code> 兼容。</li>
+      </ul>
+      <h4>增值能力</h4>
+      <p>阶段 4 起已具备配额、计费、白标等 SaaS 增值能力，使平台既能自运营，也能作为底座被集成商二次分发。</p>
+      <div class="callout">隔离是安全性的第一道防线。CLMX 把 <code>tenantId</code> 过滤作为路由层强制约定（而非业务代码自觉），从架构上消除"漏写条件导致跨租户泄露"的隐患。</div>
+    </section>
+
+    <!-- 9 -->
+    <section id="s9">
+      <h2 class="sec"><span class="num">09</span>机器学习管线</h2>
+      <h3>9.1 无监督异常检测</h3>
+      <p>采用 <strong>Autoencoder / 隔离森林</strong> 等无监督方法，<strong>免标注</strong>即可从正常工况数据中学习分布，对偏离进行打分。这直接回应了"标注稀缺"的工业现实——不需要异常样本也能上线。</p>
+      <h3>9.2 零依赖中文文本分类</h3>
+      <p>对设备工单、日志等中文文本，采用<strong>朴素贝叶斯</strong>实现，<strong>训推同构、纯 JS</strong>，不依赖任何 NLP 框架。关键词提取工具 <code>clmx_keywords</code> 即此能力的对外暴露。</p>
+      <h3>9.3 训练-推理同构与边缘 JS 推理</h3>
+      <p>训练（Python worker 负责重型拟合）与推理（零依赖 JS）共享同一套数值逻辑。推理侧不引入深度学习框架，因此<strong>可直接在边缘节点运行</strong>，实现"就近智能"，这是 CLMX 的核心护城河之一。</p>
+      <h3>9.4 告警投递</h3>
+      <p>Notification + AlertChannel 已上线：当健康分 &lt; 60 时自动推送，并可按渠道配置（如企微、Webhook）。告警不是终点，而是"半智能体闭环"的触发信号。</p>
+    </section>
+
+    <!-- 10 -->
+    <section id="s10">
+      <h2 class="sec"><span class="num">10</span>数据模型概览</h2>
+      <p>核心实体（Prisma 模型）覆盖设备、模型、训练、接入资产与多租户边界：</p>
+      <table>
+        <tr><th>模型</th><th>职责</th></tr>
+        <tr><td><code>Device</code> / <code>Sensor</code> / <code>SensorData</code></td><td>设备、测点、时序数据</td></tr>
+        <tr><td><code>AiModel</code> / <code>Dataset</code> / <code>DataVersion</code></td><td>模型、数据集及其版本</td></tr>
+        <tr><td><code>TrainingJob</code> / <code>ModelVersion</code> / <code>TrainingLog</code></td><td>训练任务、模型版本、训练日志</td></tr>
+        <tr><td><code>IngestSpec</code> / <code>IngestAsset</code></td><td>接入需求草稿 / 版本化接入资产（含 driverCode、thingModel、reuseCount）</td></tr>
+        <tr><td><code>AlertRule</code> / <code>Notification</code> / <code>AlertChannel</code></td><td>告警规则、通知与渠道</td></tr>
+        <tr><td>Tenant / User / Role</td><td>多租户与 RBAC</td></tr>
+      </table>
+      <div class="callout warn">删除顺序（FK 约束）：<code>TrainingLog → ModelVersion → TrainingJob → DataVersion → Dataset → AiModel → Device</code>。务必从最深子表起删，避免外键冲突。</div>
+    </section>
+
+    <!-- 11 -->
+    <section id="s11">
+      <h2 class="sec"><span class="num">11</span>关键技术决策与权衡</h2>
+      <table>
+        <tr><th>决策</th><th>取舍</th><th>原因</th></tr>
+        <tr><td>BigInt 补丁（server.ts 开头）</td><td>保留一段"看似多余"的补丁</td><td>SQLite/Prisma 的 BigInt 序列化缺失，删掉会导致登录 500；补丁不可删</td></tr>
+        <tr><td>PG Json 字段存为 String</td><td>放弃原生 Json 类型</td><td>应用层手动序列化，规避驱动差异，保持跨库一致</td></tr>
+        <tr><td>SSE 鉴权用 <code>?token=</code></td><td>不在 header 传 JWT</td><td>EventSource 不支持自定义 header，URL 查询参数承载令牌</td></tr>
+        <tr><td>种子脚本按 code upsert</td><td>禁止"有数据就跳过"</td><td>保证预置数据可重复运行、幂等更新</td></tr>
+        <tr><td>训练走 Python worker</td><td>引入 child_process 而非纯 JS 训练</td><td>重型拟合用 Python 生态，推理仍回零依赖 JS，训推同构</td></tr>
+        <tr><td>MCP 自实现零依赖</td><td>不引官方 SDK</td><td>保持"零依赖边缘"一致性，减小攻击面与体积</td></tr>
+      </table>
+    </section>
+
+    <!-- 12 -->
+    <section id="s12">
+      <h2 class="sec"><span class="num">12</span>安全与合规</h2>
+      <ul>
+        <li><strong>认证与授权</strong>：JWT + Bearer + RBAC 四级（含 MANAGER 等角色），敏感操作（计算健康分、触发训练、执行推理）受角色约束。</li>
+        <li><strong>多租户隔离</strong>：架构级 <code>tenantId</code> 强制过滤（见 §8）。</li>
+        <li><strong>密钥管理</strong>：真实 <code>.env</code> 与密钥从不进 git 历史；<code>.gitignore</code> 隔离 <code>.env</code> / <code>*.db</code> / 密钥 / <code>.workbuddy</code>；部署密码经环境变量（如 <code>CLMX_SSH_PASS</code>）注入，不落仓库。</li>
+        <li><strong>漏洞披露</strong>：设 <code>SECURITY.md</code>，提供私域报告通道，避免公开 issue 提前暴露风险。</li>
+        <li><strong>依赖安全</strong>：<code>dependabot.yml</code> 对前后端 npm、Python、github-actions 周级自动更新。</li>
+      </ul>
+      <div class="callout ok">开源安全审计结论：仓库历史中无真实密钥泄露；发布文件（LICENSE/README/社区健康文件）均经审计后入库。</div>
+    </section>
+
+    <!-- 13 -->
+    <section id="s13">
+      <h2 class="sec"><span class="num">13</span>开源与社区生态</h2>
+      <p>CLMX 以 MIT 协议开源，遵循"正规开源项目"实践，社区档案（Community Profile）100% 覆盖：</p>
+      <div class="grid c3">
+        <div class="card"><h4>基础</h4><p>README · MIT LICENSE · CHANGELOG</p></div>
+        <div class="card"><h4>协作</h4><p>CONTRIBUTING · CODE_OF_CONDUCT · CODEOWNERS · PR 模板</p></div>
+        <div class="card"><h4>治理</h4><p>SECURITY · SUPPORT · Issue 模板 · dependabot</p></div>
+        <div class="card"><h4>规划</h4><p>ROADMAP · Discussions（欢迎帖就位）</p></div>
+        <div class="card"><h4>可见度</h4><p>14 个 Topics 标签 · Good first issue</p></div>
+        <div class="card"><h4>双仓库</h4><p>GitHub（public）· Gitee（开源）同步</p></div>
+      </div>
+      <p>仓库地址：<br>
+        · GitHub：<a href="https://github.com/iduyuhe/clmx" target="_blank">https://github.com/iduyuhe/clmx</a><br>
+        · Gitee：<a href="https://gitee.com/i4hub/clmx" target="_blank">https://gitee.com/i4hub/clmx</a></p>
+      <p>默认演示账号 <code>test@test.com / 123456</code>（ADMIN）仅供本地演示，生产部署请立即改密并关闭公网演示入口。</p>
+    </section>
+
+    <!-- 14 -->
+    <section id="s14">
+      <h2 class="sec"><span class="num">14</span>发展路线图</h2>
+      <table>
+        <tr><th>阶段</th><th>内容</th><th>状态</th></tr>
+        <tr><td>阶段 0</td><td>规则引擎（业务验证）</td><td>✅ 完成</td></tr>
+        <tr><td>阶段 1</td><td>数据积累</td><td>✅ 完成</td></tr>
+        <tr><td>阶段 2</td><td>工业时序 ML 管线（T1）</td><td>✅ 完成</td></tr>
+        <tr><td>阶段 3</td><td>SaaS 化（行级隔离 + PG）</td><td>✅ 完成</td></tr>
+        <tr><td>阶段 4</td><td>增值（配额/计费/白标）+ Gitee 入库 + 真实设备接入（MQTT 常驻）</td><td>✅ 完成</td></tr>
+        <tr><td>阶段 5</td><td>AI 原生接入生成器（HubPort T1/T2）</td><td>✅ 完成</td></tr>
+        <tr><td>阶段 6</td><td>北向 MCP 能力底座（HubPort T4）</td><td>✅ 完成</td></tr>
+        <tr><td>阶段 7</td><td>能力资产化治理（HubPort T3）</td><td>✅ 完成</td></tr>
+      </table>
+      <p><strong>规划方向（HubPort 思想启发）：</strong>深化半智能体闭环的自主度边界、扩展接入生成器对更多协议/文档格式的覆盖、丰富 MCP 工具集、建设资产市场生态与跨租户复用激励机制。</p>
+    </section>
+
+    <!-- 15 -->
+    <section id="s15">
+      <h2 class="sec"><span class="num">15</span>结语</h2>
+      <p>CLMX 不是又一个"更聪明的仪表盘"。它把工业 AI 从"训练一个模型"升级为"运营一座模型工厂"——用 AI 原生接入生成器消化接入成本，用零依赖边缘推理守住运行边界，用北向 MCP 把能力开放给外部智能体，用半智能体闭环让平台自身参与决策。</p>
+      <p>我们以 MIT 协议把整套平台开源，既是对"工业互联网 AI 普惠"的承诺，也欢迎社区共建接入模板、模型算法与资产市场。模型工厂的门，已经打开。</p>
+      <div class="callout"><b>如何参与：</b>① 在 GitHub/Gitee 提 Issue 与 PR；② 用接入生成器贡献设备模板到资产市场；③ 基于 MCP 工具构建你的工业智能体；④ 在 Discussions 分享你的落地实践。</div>
+    </section>
+
+    <!-- Appendix -->
+    <section id="app">
+      <h2 class="sec"><span class="num">附</span>术语表与资源</h2>
+      <h4>术语表</h4>
+      <table>
+        <tr><th>术语</th><th>含义</th></tr>
+        <tr><td>垂类模型</td><td>针对某一具体工业场景训练出的模型（CLMX 的产出物）</td></tr>
+        <tr><td>半智能体</td><td>具备感知—决策—处置闭环，但在人设边界内运转的可控智能（第 3 档）</td></tr>
+        <tr><td>训推同构</td><td>训练与推理使用同一套代码与数值逻辑</td></tr>
+        <tr><td>接入生成器</td><td>从设备文档/样本/描述自动生成物模型与零依赖采集驱动</td></tr>
+        <tr><td>MCP</td><td>Model Context Protocol，北向能力开放标准协议</td></tr>
+        <tr><td>物模型</td><td>对设备测点及其类型/单位的抽象描述</td></tr>
+        <tr><td>资产市场</td><td>接入资产（IngestAsset）的发布与复用平台</td></tr>
+      </table>
+      <h4>资源</h4>
+      <ul>
+        <li>GitHub 仓库：<a href="https://github.com/iduyuhe/clmx" target="_blank">https://github.com/iduyuhe/clmx</a></li>
+        <li>Gitee 仓库：<a href="https://gitee.com/i4hub/clmx" target="_blank">https://gitee.com/i4hub/clmx</a></li>
+        <li>README / CONTRIBUTING / SECURITY / ROADMAP：见仓库根目录与 <code>docs/</code></li>
+        <li>宣传物料：<code>docs/CLMX宣传手册.html</code> · <code>docs/CLMX开源发布.pptx</code></li>
+      </ul>
+      <p style="color:var(--muted);font-size:13px;margin-top:24px">© 2026 CLMX Authors · 本白皮书以 MIT 协议随仓库一同发布，可自由引用与再分发，请保留出处。</p>
+    </section>
+
+  </div>
+
+  <footer>
+    CLMX 技术白皮书 v1.0 · 面向工业互联网的垂类 AI 模型训练、推理与能力开放平台 ·
+    <a href="https://github.com/iduyuhe/clmx" target="_blank">GitHub</a> /
+    <a href="https://gitee.com/i4hub/clmx" target="_blank">Gitee</a> ·
+    MIT License
+  </footer>
+
+</div>
+</body>
+</html>
