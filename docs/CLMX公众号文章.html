@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>我们开源了 CLMX：把工业 AI 的门槛降下来</title>
+<style>
+  body{margin:0;padding:0;background:#f4f6fb;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;}
+  .wx{width:100%;max-width:680px;margin:0 auto;background:#fff;padding:24px 20px 48px;box-sizing:border-box;color:#3f3f3f;line-height:1.9;font-size:16px;}
+  h1{font-size:24px;line-height:1.4;color:#0f1e3d;font-weight:800;margin:8px 0 4px;letter-spacing:.5px;}
+  .sub{color:#5a6b8c;font-size:14px;margin:0 0 20px;}
+  h2{font-size:20px;color:#13315c;font-weight:700;margin:34px 0 12px;border-left:5px solid #2b6cff;padding-left:12px;}
+  h3{font-size:17px;color:#1c3b6e;font-weight:700;margin:24px 0 8px;}
+  p{margin:12px 0;}
+  .lead{background:linear-gradient(135deg,#0f1e3d,#1c3b6e);color:#fff;border-radius:14px;padding:20px 22px;font-size:16px;line-height:1.8;margin:20px 0 28px;box-shadow:0 6px 18px rgba(15,30,61,.18);}
+  .lead b{color:#7fb0ff;}
+  .card{background:#f6f9ff;border:1px solid #e2ebff;border-radius:12px;padding:16px 18px;margin:16px 0;}
+  .card .k{font-weight:700;color:#13315c;font-size:16px;margin-bottom:4px;}
+  .card .v{color:#4a5a78;font-size:15px;}
+  .num{display:inline-block;background:#2b6cff;color:#fff;width:26px;height:26px;line-height:26px;text-align:center;border-radius:50%;font-size:14px;font-weight:700;margin-right:8px;}
+  blockquote{margin:18px 0;padding:12px 16px;background:#fbfcff;border-left:4px solid #7fb0ff;color:#5a6b8c;font-size:15px;border-radius:0 8px 8px 0;}
+  .pill{display:inline-block;background:#eef4ff;color:#1c3b6e;border-radius:20px;padding:4px 12px;font-size:13px;margin:4px 6px 4px 0;font-weight:600;}
+  .repo{background:#0f1e3d;color:#fff;border-radius:12px;padding:18px 20px;margin:22px 0;text-align:center;}
+  .repo a{color:#7fb0ff;text-decoration:none;font-weight:700;word-break:break-all;}
+  .repo .t{font-size:13px;color:#9fb4dd;margin-bottom:6px;}
+  .end{margin-top:30px;padding-top:18px;border-top:1px dashed #d7e0f2;color:#7a89a8;font-size:14px;text-align:center;}
+  .tag{background:#fff7e6;border:1px solid #ffe1a8;color:#a36b00;border-radius:8px;padding:10px 14px;font-size:14px;margin:18px 0;}
+  ul{margin:12px 0;padding-left:22px;}
+  li{margin:8px 0;}
+</style>
+</head>
+<body>
+<section class="wx">
+
+  <p class="sub">CLMX 团队 · 2026-08-10</p>
+  <h1>我们开源了 CLMX：把工业 AI 的门槛降下来</h1>
+
+  <div class="lead">
+    过去半年，我们一直在做一件事：让一家普通工厂，也能用上「属于自己的工业 AI」——不用养算法团队、不用堆 GPU、不用从零造平台。<b>今天，我们把这套系统 CLMX 正式开源了。</b>
+  </div>
+
+  <h2>一、CLMX 是什么</h2>
+  <p>一句话：<b>CLMX 是一个面向工业互联网的垂类 AI 模型训练、推理与能力开放平台。</b></p>
+  <p>更准确地说，CLMX 不是某一个"智能模型"，也不是一个"聊天机器人"。它是一座<span class="pill">模型工厂</span>——你给它工业设备的运行数据，它帮你训练出专属于你的预测性维修模型；你给它一段设备文档，它自动生成采集驱动把数据接进来；你用自然语言就能指挥它做健康分评估、跑推理、触发训练。</p>
+  <p>它的三层定位可以这么理解：</p>
+  <div class="card"><div class="k">🏭 表 · 工业设备预防性维修</div><div class="v">设备健康分、异常告警、预测性维护——这是用户直接看到的业务价值。</div></div>
+  <div class="card"><div class="k">🧠 里 · NLP / ML 模型平台</div><div class="v">无监督异常检测、零依赖中文文本分类、模型训练与推理底座。</div></div>
+  <div class="card"><div class="k">☁️ 底座 · SaaS 多租户交付</div><div class="v">行级数据隔离、配额计费、白标，一套平台服务多家客户。</div></div>
+
+  <h2>二、我们看到了什么痛点</h2>
+  <p>做工业 AI 这些年，我们反复撞上"四道坎"：</p>
+  <ul>
+    <li><b>接入即地狱</b>：上千种设备协议、五花八门的字段，接数据往往比建模本身还累。</li>
+    <li><b>标注稀缺</b>：工业故障样本极少，有监督学习在车间里经常"无米下锅"。</li>
+    <li><b>边缘跑不动</b>：动辄上 G 的深度学习框架，根本塞不进现场的边缘盒子。</li>
+    <li><b>平台不智能</b>：很多"平台"只是把工具堆在一起，决策还得人拍脑袋。</li>
+  </ul>
+  <p>CLMX 的每一条设计，几乎都是被这四道坎"逼"出来的。</p>
+
+  <h2>三、四大核心能力</h2>
+
+  <h3><span class="num">1</span>半智能体闭环</h3>
+  <p>我们不做"全自主智能体"（那与零依赖边缘底座冲突），而是落地<b>第 3 档"半智能体"</b>：用自然语言下达指令 → 自动建基线/算阈值 → 异常自动处置 → 训练结果自动解读。感知-决策-处置形成闭环，人只在关键节点把关。</p>
+
+  <h3><span class="num">2</span>AI 原生接入生成器</h3>
+  <p>这是应对"接入即地狱"的杀手锏。你丢给它一份设备文档、一段样本数据或一句中文描述，它自动提取测点、生成物模型，并产出一段<b>零依赖的 JavaScript 采集驱动</b>，再用沙箱自测跑通后才交付。接线员也能在几分钟内接好一台新设备。</p>
+
+  <h3><span class="num">3</span>北向 MCP 能力开放</h3>
+  <p>CLMX 不只是"被用的平台"，更是"可被编排的能力"。我们实现了<b>零依赖的 JSON-RPC（MCP 协议）</b>服务端，对外封装了 10 个工具——自然语言指令、设备列表、健康看板、触发训练、跑推理等，让外部 AI 智能体可以直接调度 CLMX 的能力。</p>
+
+  <h3><span class="num">4</span>多租户 SaaS 隔离</h3>
+  <p>所有 CRUD 强制带 <code>tenantId</code> 行级隔离，预置数据按 <code>tenantId IS NULL</code> 共享，JWT 注入身份与角色。一套平台，安全地服务多家客户。</p>
+
+  <h2>四、技术底座的两个"护城河"</h2>
+  <div class="card"><div class="k">🔧 零依赖</div><div class="v">核心推理不依赖任何深度学习框架，纯 JavaScript 即可在边缘盒子跑起来。部署体积以 KB 计，而不是 GB。</div></div>
+  <div class="card"><div class="k">🔁 训推同构</div><div class="v">训练端和推理端用同一套代码与数学定义，模型从平台出来就能直接在现场跑，不存在"训得好推不动"的断层。</div></div>
+  <blockquote>我们用"无监督异常检测"解决标注稀缺，用"朴素贝叶斯零依赖 NLP"解决边缘跑不动——务实，但不取巧。</blockquote>
+
+  <h2>五、这次开源了什么</h2>
+  <p>CLMX 已在 <b>GitHub</b> 与 <b>Gitee</b> 两端同步开源，并补齐了一套正规开源项目该有的"社区健康文件"：</p>
+  <div class="pill">MIT LICENSE</div><div class="pill">README</div><div class="pill">CONTRIBUTING 贡献指南</div><div class="pill">CODE_OF_CONDUCT 行为准则</div><div class="pill">SECURITY 安全政策</div><div class="pill">SUPPORT 支持说明</div><div class="pill">CHANGELOG 变更日志</div><div class="pill">Issue / PR 模板</div><div class="pill">dependabot 依赖更新</div><div class="pill">ROADMAP 路线图</div><div class="pill">Discussions 讨论区</div><div class="pill">技术白皮书（中/英）</div>
+  <p>同时我们开放了文档体系：单页宣传手册、16:9 汇报 PPT、以及中英文技术白皮书，方便你快速了解或在内部汇报。</p>
+
+  <div class="repo">
+    <div class="t">立即访问（两端均开源）</div>
+    <a href="https://github.com/iduyuhe/clmx">GitHub · github.com/iduyuhe/clmx</a><br>
+    <a href="https://gitee.com/i4hub/clmx">Gitee · gitee.com/i4hub/clmx</a>
+  </div>
+
+  <h2>六、怎么参与</h2>
+  <p>无论你是工业一线的工程师、做 AI 的开发者，还是想给自家设备配上预测性维修的厂商，都欢迎加入：</p>
+  <ul>
+    <li>📖 读一读 <b>README</b> 和 <b>技术白皮书</b>，十分钟看懂架构；</li>
+    <li>🐛 在 <b>Issues</b> 里提 Bug 或功能建议（我们留了 Good first issue 给新人）；</li>
+    <li>💬 到 <b>Discussions</b> 聊聊你的工业 AI 场景；</li>
+    <li>🔧 按 <b>CONTRIBUTING</b> 指南提 PR，一起把工业 AI 的门槛降下来。</li>
+  </ul>
+
+  <div class="tag">
+    💡 安全提示：仓库默认演示账号为 <code>test@test.com / 123456</code>，仅用于本地体验，生产部署请务必更换并配置独立数据库凭证。
+  </div>
+
+  <div class="end">
+    把工业 AI 从"大厂专利"变成"人人可用"，这件事我们才刚开头。<br>
+    欢迎 Star、Fork、提 Issue —— 我们在 CLMX 等你。
+  </div>
+
+</section>
+</body>
+</html>
