@@ -1,5 +1,7 @@
 # CLMX — 面向工业互联网的垂类 AI 模型训练、推理与能力开放平台
 
+[![GitHub Release](https://img.shields.io/github/v/release/iduyuhe/clmx?label=Release)](https://github.com/iduyuhe/clmx/releases) [![GitHub License](https://img.shields.io/github/license/iduyuhe/clmx)](https://github.com/iduyuhe/clmx/blob/main/LICENSE) [![GitHub stars](https://img.shields.io/github/stars/iduyuhe/clmx)](https://github.com/iduyuhe/clmx) [![GitHub Discussions](https://img.shields.io/github/discussions/iduyuhe/clmx)](https://github.com/iduyuhe/clmx/discussions)
+
 一个全栈 AI 模型生命周期管理平台，覆盖从数据准备、模型训练、评估到推理部署的完整工作流。融合**半智能体闭环**、**AI 原生接入生成器**与**北向 MCP 能力开放**，支持本地 CPU 开发调试、远端 GPU 生产部署的统一架构。
 
 ## 架构
