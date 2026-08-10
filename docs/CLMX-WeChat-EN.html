@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>We Open-Sourced CLMX: Lowering the Barrier to Industrial AI</title>
+<style>
+  body{margin:0;padding:0;background:#f4f6fb;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,sans-serif;}
+  .wx{width:100%;max-width:680px;margin:0 auto;background:#fff;padding:24px 20px 48px;box-sizing:border-box;color:#3f3f3f;line-height:1.9;font-size:16px;}
+  h1{font-size:24px;line-height:1.35;color:#0f1e3d;font-weight:800;margin:8px 0 4px;letter-spacing:.3px;}
+  .sub{color:#5a6b8c;font-size:14px;margin:0 0 20px;}
+  h2{font-size:20px;color:#13315c;font-weight:700;margin:34px 0 12px;border-left:5px solid #2b6cff;padding-left:12px;}
+  h3{font-size:17px;color:#1c3b6e;font-weight:700;margin:24px 0 8px;}
+  p{margin:12px 0;}
+  .lead{background:linear-gradient(135deg,#0f1e3d,#1c3b6e);color:#fff;border-radius:14px;padding:20px 22px;font-size:16px;line-height:1.8;margin:20px 0 28px;box-shadow:0 6px 18px rgba(15,30,61,.18);}
+  .lead b{color:#7fb0ff;}
+  .card{background:#f6f9ff;border:1px solid #e2ebff;border-radius:12px;padding:16px 18px;margin:16px 0;}
+  .card .k{font-weight:700;color:#13315c;font-size:16px;margin-bottom:4px;}
+  .card .v{color:#4a5a78;font-size:15px;}
+  .num{display:inline-block;background:#2b6cff;color:#fff;width:26px;height:26px;line-height:26px;text-align:center;border-radius:50%;font-size:14px;font-weight:700;margin-right:8px;}
+  blockquote{margin:18px 0;padding:12px 16px;background:#fbfcff;border-left:4px solid #7fb0ff;color:#5a6b8c;font-size:15px;border-radius:0 8px 8px 0;}
+  .pill{display:inline-block;background:#eef4ff;color:#1c3b6e;border-radius:20px;padding:4px 12px;font-size:13px;margin:4px 6px 4px 0;font-weight:600;}
+  .repo{background:#0f1e3d;color:#fff;border-radius:12px;padding:18px 20px;margin:22px 0;text-align:center;}
+  .repo a{color:#7fb0ff;text-decoration:none;font-weight:700;word-break:break-all;}
+  .repo .t{font-size:13px;color:#9fb4dd;margin-bottom:6px;}
+  .end{margin-top:30px;padding-top:18px;border-top:1px dashed #d7e0f2;color:#7a89a8;font-size:14px;text-align:center;}
+  .tag{background:#fff7e6;border:1px solid #ffe1a8;color:#a36b00;border-radius:8px;padding:10px 14px;font-size:14px;margin:18px 0;}
+  ul{margin:12px 0;padding-left:22px;}
+  li{margin:8px 0;}
+</style>
+</head>
+<body>
+<section class="wx">
+
+  <p class="sub">The CLMX Team · 2026-08-10</p>
+  <h1>We Open-Sourced CLMX: Lowering the Barrier to Industrial AI</h1>
+
+  <div class="lead">
+    For the past six months we've been chasing one idea: letting an ordinary factory run <b>its own industrial AI</b> — without hiring an algorithm team, without stacking up GPUs, and without building a platform from scratch. <b>Today we're open-sourcing that system: CLMX.</b>
+  </div>
+
+  <h2>1. What is CLMX</h2>
+  <p>In one sentence: <b>CLMX is an industrial-internet-oriented platform for training, inference, and capability opening of vertical AI models.</b></p>
+  <p>More precisely, CLMX is not a single "smart model", nor a "chatbot". It is a <span class="pill">model factory</span> — feed it your equipment's operational data and it trains a predictive-maintenance model that is uniquely yours; hand it a device manual and it auto-generates a collector to pull the data in; talk to it in natural language and it evaluates health scores, runs inference, and triggers training for you.</p>
+  <p>Its three-layer positioning:</p>
+  <div class="card"><div class="k">🏭 Surface · Industrial preventive maintenance</div><div class="v">Equipment health scores, anomaly alerts, predictive maintenance — the business value users see directly.</div></div>
+  <div class="card"><div class="k">🧠 Middle · NLP / ML model platform</div><div class="v">Unsupervised anomaly detection, zero-dependency Chinese text classification, the model training &amp; inference core.</div></div>
+  <div class="card"><div class="k">☁️ Base · SaaS multi-tenant delivery</div><div class="v">Row-level data isolation, quotas &amp; billing, white-label — one platform serving many customers.</div></div>
+
+  <h2>2. The Pain Points We Saw</h2>
+  <p>Doing industrial AI, we kept hitting the same "four walls":</p>
+  <ul>
+    <li><b>Integration is hell</b>: thousands of device protocols and ad-hoc fields — wiring data is often harder than modeling itself.</li>
+    <li><b>Labels are scarce</b>: industrial fault samples are rare; supervised learning frequently runs out of fuel on the shop floor.</li>
+    <li><b>Edge can't run it</b>: deep-learning frameworks measured in gigabytes simply don't fit into on-site edge boxes.</li>
+    <li><b>Platforms aren't smart</b>: many "platforms" just pile tools together; humans still make every call.</li>
+  </ul>
+  <p>Nearly every design choice in CLMX was forced out of these four walls.</p>
+
+  <h2>3. Four Core Capabilities</h2>
+
+  <h3><span class="num">1</span>Semi-Agent Closed Loop</h3>
+  <p>We don't build a "fully autonomous agent" (that conflicts with our zero-dependency edge base). Instead we land at the <b>3rd tier — "semi-agent"</b>: natural-language commands → auto-baseline / thresholding → automatic anomaly handling → automatic training interpretation. A perception-decision-action loop, with humans guarding only the key nodes.</p>
+
+  <h3><span class="num">2</span>AI-Native Ingestion Generator</h3>
+  <p>Our answer to "integration is hell". Drop in a device manual, a sample dataset, or a one-line Chinese description — it extracts measurement points, generates a thing model, and emits a <b>zero-dependency JavaScript collector</b>, then self-tests it in a sandbox before delivery. A wiring tech can onboard a new device in minutes.</p>
+
+  <h3><span class="num">3</span>Northbound MCP Capability Opening</h3>
+  <p>CLMX isn't just a platform "to be used" — it's a capability "to be orchestrated". We implemented a <b>zero-dependency JSON-RPC (MCP protocol)</b> server exposing 10 tools — NL commands, device listing, health dashboards, trigger-training, run-inference — so external AI agents can directly schedule CLMX's capabilities.</p>
+
+  <h3><span class="num">4</span>Multi-Tenant SaaS Isolation</h3>
+  <p>Every CRUD is forced to carry <code>tenantId</code> row-level isolation; preset data is shared via <code>tenantId IS NULL</code>; JWT injects identity and role. One platform, safely serving many customers.</p>
+
+  <h2>4. Two Moats in the Technical Base</h2>
+  <div class="card"><div class="k">🔧 Zero-dependency</div><div class="v">Core inference depends on no deep-learning framework — pure JavaScript runs on edge boxes. Deployment size is measured in KB, not GB.</div></div>
+  <div class="card"><div class="k">🔁 Train-infer isomorphism</div><div class="v">Training and inference share the same code and math definitions, so a model leaving the platform runs on-site directly — no "trains well, can't infer" gap.</div></div>
+  <blockquote>We use "unsupervised anomaly detection" to solve label scarcity, and "zero-dependency Naive-Bayes NLP" to solve edge constraints — pragmatic, but not a shortcut.</blockquote>
+
+  <h2>5. What We Open-Sourced</h2>
+  <p>CLMX is open-sourced on both <b>GitHub</b> and <b>Gitee</b>, with the full set of "community health files" a proper open-source project should have:</p>
+  <div class="pill">MIT LICENSE</div><div class="pill">README</div><div class="pill">CONTRIBUTING</div><div class="pill">CODE_OF_CONDUCT</div><div class="pill">SECURITY</div><div class="pill">SUPPORT</div><div class="pill">CHANGELOG</div><div class="pill">Issue / PR templates</div><div class="pill">dependabot</div><div class="pill">ROADMAP</div><div class="pill">Discussions</div><div class="pill">White papers (CN / EN)</div>
+  <p>We also ship a documentation suite — a one-page brochure, a 16:9 slide deck, and Chinese/English technical white papers — so you can grasp or present the project in minutes.</p>
+
+  <div class="repo">
+    <div class="t">Visit now (both repos open-sourced)</div>
+    <a href="https://github.com/iduyuhe/clmx">GitHub · github.com/iduyuhe/clmx</a><br>
+    <a href="https://gitee.com/i4hub/clmx">Gitee · gitee.com/i4hub/clmx</a>
+  </div>
+
+  <h2>6. How to Get Involved</h2>
+  <p>Whether you're a front-line engineer, an AI developer, or a vendor wanting predictive maintenance on your own equipment — you're welcome:</p>
+  <ul>
+    <li>📖 Read the <b>README</b> and <b>white paper</b> to understand the architecture in ten minutes;</li>
+    <li>🐛 File bugs or feature ideas in <b>Issues</b> (we left a Good first issue for newcomers);</li>
+    <li>💬 Talk about your industrial-AI scenario in <b>Discussions</b>;</li>
+    <li>🔧 Submit a PR following the <b>CONTRIBUTING</b> guide — let's lower the barrier together.</li>
+  </ul>
+
+  <div class="tag">
+    💡 Security note: the default demo account is <code>test@test.com / 123456</code>, for local experience only. For production, please change it and configure an independent database credential.
+  </div>
+
+  <div class="end">
+    Turning industrial AI from a "big-vendor monopoly" into something "anyone can use" — we're only at the beginning.<br>
+    Star, fork, and open an issue — we'll see you in CLMX.
+  </div>
+
+</section>
+</body>
+</html>
