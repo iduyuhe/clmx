@@ -180,6 +180,145 @@ clmx/
 | Ingest | `/api/ingest` | 10+ | AI 原生接入生成器（规格/生成/自测/资产/复用） |
 | MCP | stdio | 10 | 北向能力开放（外部 AI 可调用，非 HTTP） |
 
+### curl 调用示例
+
+以下示例默认后端运行在 `http://localhost:3002`（`cd server && npm run dev` 启动）。除注册/登录外，其余端点均需 JWT 鉴权：先调用登录接口获取 `data.token`，导出为环境变量 `$TOKEN` 后通过 `Authorization: Bearer $TOKEN` 请求头携带。示例中 `<XXX_ID>` 为占位符，请替换为实际返回的 `data.id`。
+
+#### Auth（`/api/auth`）
+
+```bash
+# 登录获取 JWT（演示账号仅供本地开发）
+curl -X POST http://localhost:3002/api/auth/login \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"test@test.com","password":"123456"}'
+
+# 将上一步返回的 data.token 导出，供后续示例使用
+export TOKEN=<data.token>
+
+# 查看当前登录用户
+curl http://localhost:3002/api/auth/me -H "Authorization: Bearer $TOKEN"
+```
+
+#### Users（`/api/users`，需 admin 角色）
+
+```bash
+# 用户列表
+curl http://localhost:3002/api/users -H "Authorization: Bearer $TOKEN"
+
+# 创建成员
+curl -X POST http://localhost:3002/api/users \
+  -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
+  -d '{"email":"alice@example.com","name":"Alice","password":"secret123","role":"MEMBER"}'
+```
+
+#### Dashboard（`/api/dashboard`）
+
+```bash
+# 聚合统计 + API 调用趋势
+curl http://localhost:3002/api/dashboard -H "Authorization: Bearer $TOKEN"
+```
+
+#### Industries（`/api/industries`）
+
+```bash
+# 行业列表（含嵌套场景）
+curl http://localhost:3002/api/industries -H "Authorization: Bearer $TOKEN"
+
+# 创建行业（需 admin 角色）
+curl -X POST http://localhost:3002/api/industries \
+  -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
+  -d '{"name":"钢铁冶金","code":"steel","description":"高炉与轧线场景","icon":"factory"}'
+```
+
+#### Datasets（`/api/datasets`）
+
+```bash
+# 创建数据集（返回的 data.id 即 <DATASET_ID>）
+curl -X POST http://localhost:3002/api/datasets \
+  -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
+  -d '{"name":"轴承振动样本","description":"示例数据集","industry":"钢铁冶金","scenario":"预测性维护"}'
+
+# 上传数据文件（multipart 表单，字段名为 file）
+curl -X POST http://localhost:3002/api/datasets/<DATASET_ID>/upload \
+  -H "Authorization: Bearer $TOKEN" -F 'file=@sample.csv'
+```
+
+#### Models（`/api/models`）
+
+```bash
+# 模型列表（分页）
+curl 'http://localhost:3002/api/models?page=1&pageSize=20' -H "Authorization: Bearer $TOKEN"
+
+# 创建模型
+curl -X POST http://localhost:3002/api/models \
+  -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
+  -d '{"name":"设备故障分类器","description":"文本分类模型","industry":"钢铁冶金","scenario":"预测性维护","baseModel":"bert-base-chinese"}'
+```
+
+#### Training（`/api/training`）
+
+```bash
+# 创建并启动训练任务（<DATASET_VERSION_ID> 可从 GET /api/datasets/<DATASET_ID>/versions 获取）
+curl -X POST http://localhost:3002/api/training \
+  -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
+  -d '{"modelId":"<MODEL_ID>","datasetVersionId":"<DATASET_VERSION_ID>","hyperparams":{"epochs":3,"batchSize":16,"learningRate":0.001}}'
+
+# 控制训练任务（pause / resume / stop）
+curl -X POST http://localhost:3002/api/training/<JOB_ID>/stop -H "Authorization: Bearer $TOKEN"
+```
+
+#### Deployments（`/api/deployments`）
+
+```bash
+# 创建部署（响应中的 data.apiKey 仅返回一次，请妥善保存）
+curl -X POST http://localhost:3002/api/deployments \
+  -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
+  -d '{"modelVersionId":"<MODEL_VERSION_ID>","name":"故障分类在线服务","gpuType":"CPU","instanceCount":1}'
+
+# 公开推理端点：无需 JWT，使用 x-api-key 鉴权（供外部系统调用）
+curl -X POST http://localhost:3002/api/deployments/<MODEL_VERSION_ID>/infer \
+  -H 'x-api-key: <API_KEY>' -H 'Content-Type: application/json' \
+  -d '{"input":"设备振动异常，噪音明显增大","task":"text-classification"}'
+```
+
+#### Inference（`/api/inference`）
+
+```bash
+# 通用推理（首次调用会自动下载模型，耗时较长）
+curl -X POST http://localhost:3002/api/inference/predict \
+  -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
+  -d '{"task":"text-classification","texts":["设备振动异常，噪音明显增大"]}'
+
+# 关键词提取（纯 JS 实现，无需下载模型）
+curl -X POST http://localhost:3002/api/inference/keywords \
+  -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
+  -d '{"texts":"轧机主传动电机温度持续升高，振动加剧","topN":5}'
+```
+
+#### Settings（`/api/settings`）
+
+```bash
+# 当前租户信息（含品牌配置与套餐）
+curl http://localhost:3002/api/settings/tenant -H "Authorization: Bearer $TOKEN"
+
+# 审计日志（分页，需 manager 及以上角色）
+curl 'http://localhost:3002/api/settings/audit-logs?page=1&pageSize=20' -H "Authorization: Bearer $TOKEN"
+```
+
+#### Ingest（`/api/ingest`）
+
+```bash
+# 创建 AI 原生接入需求（JWT 鉴权）
+curl -X POST http://localhost:3002/api/ingest/specs \
+  -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
+  -d '{"name":"某型号PLC接入","description":"Modbus TCP 寄存器表","sourceType":"http","rawSpec":"寄存器40001: 电机温度, 单位摄氏度"}'
+
+# 设备遥测上报（租户 API Key 鉴权；deviceCode/sensorChannel 需已在设备管理中创建）
+curl -X POST http://localhost:3002/api/ingest/telemetry \
+  -H 'x-api-key: <API_KEY>' -H 'Content-Type: application/json' \
+  -d '[{"deviceCode":"DEV-001","sensorChannel":"temp","value":72.5}]'
+```
+
 ## 部署到远端 GPU
 
 本平台设计为「本地 CPU 开发 → 远端 GPU 部署」统一架构：
