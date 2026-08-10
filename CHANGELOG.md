@@ -2,9 +2,13 @@
 
 本项目遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/) 约定，版本号采用 [语义化版本](https://semver.org/lang/zh-CN/)。
 
-## [0.1.0] - 2026-08-10
+## [Unreleased]
 
-> 首次公开开源版本。
+_当前开发中的变更将记录在此处。_
+
+## [0.1.0] - 2026-08-10 — ✅ 已发布
+
+> 首次公开开源版本。Release 见 [GitHub](https://github.com/iduyuhe/clmx/releases/tag/v0.1.0) / [Gitee](https://gitee.com/i4hub/clmx/releases/v0.1.0)。
 
 ### 新增
 
@@ -20,3 +24,6 @@
 
 - 默认演示账号 `test@test.com / 123456` 仅供本地开发，生产请立即修改
 - 仓库默认分支：GitHub `main`、Gitee `master`
+
+[Unreleased]: https://github.com/iduyuhe/clmx/compare/v0.1.0...main
+[0.1.0]: https://github.com/iduyuhe/clmx/releases/tag/v0.1.0
