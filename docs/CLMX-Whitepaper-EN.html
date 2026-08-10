@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CLMX Technical White Paper · Vertical AI Model Training, Inference & Capability-Open Platform for Industrial Internet</title>
+<style>
+  :root{
+    --ink:#0f1b2d; --ink2:#29405e; --muted:#5d7290;
+    --line:#e2e8f1; --bg:#ffffff; --bg2:#f5f8fc; --bg3:#eef3f9;
+    --brand:#1657d6; --brand2:#0aa6b8; --accent:#ff8a3d;
+    --ok:#1b9e6b; --warn:#d98a00; --code:#0b1f3a;
+    --maxw:920px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; color:var(--ink); background:var(--bg2);
+    font-family:"Microsoft YaHei","PingFang SC","Segoe UI",-apple-system,sans-serif;
+    line-height:1.75; font-size:16px; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:var(--maxw); margin:0 auto; background:var(--bg); padding:0 0 80px; box-shadow:0 0 60px rgba(15,27,45,.06)}
+  .cover{
+    background:linear-gradient(135deg,#0a1f45 0%,#10316b 55%,#0a6f7e 100%);
+    color:#fff; padding:84px 64px 64px; position:relative; overflow:hidden;
+  }
+  .cover::after{content:""; position:absolute; right:-80px; top:-80px; width:320px; height:320px; border:1px solid rgba(255,255,255,.12); border-radius:50%}
+  .cover::before{content:""; position:absolute; right:-30px; top:-30px; width:200px; height:200px; border:1px solid rgba(255,255,255,.16); border-radius:50%}
+  .cover .kicker{font-size:13px; letter-spacing:3px; color:#9fd6e0; text-transform:uppercase}
+  .cover h1{font-size:40px; margin:14px 0 6px; font-weight:800; letter-spacing:.5px}
+  .cover .sub{font-size:17px; color:#cfe0f5; font-weight:400; max-width:680px}
+  .cover .meta{margin-top:38px; display:flex; flex-wrap:wrap; gap:14px 30px; font-size:13.5px; color:#bcd0ea}
+  .cover .meta b{color:#fff; font-weight:600}
+  .badges{margin-top:26px; display:flex; flex-wrap:wrap; gap:10px}
+  .badge{background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.18); color:#eaf2ff; padding:5px 12px; border-radius:999px; font-size:12.5px}
+  .toc{padding:38px 64px 8px}
+  .toc h2{font-size:14px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin:0 0 14px}
+  .toc ol{margin:0; padding-left:20px; columns:2; column-gap:40px}
+  .toc li{margin:5px 0; break-inside:avoid}
+  .toc a{color:var(--brand); text-decoration:none}
+  .toc a:hover{text-decoration:underline}
+  .body{padding:10px 64px 0}
+  section{padding:26px 0; border-top:1px solid var(--line)}
+  section:first-of-type{border-top:none}
+  h2.sec{font-size:25px; margin:0 0 6px; color:var(--ink); display:flex; align-items:baseline; gap:12px}
+  h2.sec .num{color:var(--brand); font-weight:800; font-size:22px}
+  h3{font-size:18px; margin:26px 0 8px; color:var(--ink2)}
+  h4{font-size:15px; margin:18px 0 6px; color:var(--brand2); font-weight:700}
+  p{margin:10px 0}
+  ul,ol{padding-left:22px}
+  li{margin:6px 0}
+  a{color:var(--brand)}
+  strong{color:var(--ink)}
+  .lead{font-size:17px; color:var(--ink2)}
+  .callout{border-left:4px solid var(--brand); background:var(--bg2); padding:14px 18px; margin:16px 0; border-radius:0 8px 8px 0}
+  .callout.warn{border-color:var(--warn); background:#fff8ec}
+  .callout.ok{border-color:var(--ok); background:#eefaf3}
+  .callout b{color:var(--ink)}
+  code{font-family:"Cascadia Code","Consolas","SFMono-Regular",monospace; font-size:13.5px; background:var(--bg3); padding:1px 6px; border-radius:5px; color:#9a2b4a}
+  pre{background:var(--code); color:#e6edf6; padding:16px 18px; border-radius:10px; overflow:auto; font-size:13px; line-height:1.6}
+  pre code{background:none; color:inherit; padding:0}
+  .c-key{color:#7fd1ff} .c-str{color:#9be6a8} .c-com{color:#6b8099} .c-fn{color:#ffd479}
+  table{border-collapse:collapse; width:100%; margin:16px 0; font-size:14.5px}
+  th,td{border:1px solid var(--line); padding:9px 12px; text-align:left; vertical-align:top}
+  th{background:var(--bg3); color:var(--ink2); font-weight:700}
+  tr:nth-child(even) td{background:var(--bg2)}
+  .fig{margin:22px 0; text-align:center}
+  .fig svg{max-width:100%; height:auto}
+  .fig .cap{font-size:13px; color:var(--muted); margin-top:8px}
+  .grid{display:grid; gap:14px; margin:16px 0}
+  .grid.c2{grid-template-columns:1fr 1fr}
+  .grid.c3{grid-template-columns:repeat(3,1fr)}
+  .card{border:1px solid var(--line); border-radius:12px; padding:16px 18px; background:var(--bg)}
+  .card h4{margin-top:0; color:var(--brand)}
+  .card .ic{font-size:22px}
+  .stat{display:flex; gap:22px; flex-wrap:wrap; margin:18px 0}
+  .stat .s{border:1px solid var(--line); border-radius:12px; padding:14px 20px; min-width:120px; text-align:center; background:var(--bg2)}
+  .stat .s .n{font-size:30px; font-weight:800; color:var(--brand)}
+  .stat .s .l{font-size:13px; color:var(--muted)}
+  footer{padding:34px 64px; color:var(--muted); font-size:13px; border-top:1px solid var(--line); margin-top:20px}
+  footer a{color:var(--brand)}
+  @media print{
+    body{background:#fff} .wrap{box-shadow:none; max-width:none}
+    .cover{-webkit-print-color-adjust:exact; print-color-adjust:exact}
+    section{page-break-inside:avoid} pre,.fig{page-break-inside:avoid}
+    .toc{display:none} a{color:var(--ink); text-decoration:none}
+  }
+  @media (max-width:680px){
+    .cover,.toc,.body,footer{padding-left:22px; padding-right:22px}
+    .cover h1{font-size:28px} .toc ol{columns:1}
+    .grid.c2,.grid.c3{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="cover">
+    <div class="kicker">Technical White Paper</div>
+    <h1>CLMX Technical White Paper</h1>
+    <div class="sub">A vertical AI model training, inference &amp; capability-open platform for the industrial internet<br>
+      — upgrading "train one model" into "operate a model factory"</div>
+    <div class="meta">
+      <div><b>Version</b> v1.0 (Platform stages 0–7)</div>
+      <div><b>Date</b> 2026-08-10</div>
+      <div><b>License</b> MIT Open Source</div>
+      <div><b>Team</b> CLMX Authors</div>
+    </div>
+    <div class="badges">
+      <span class="badge">Model Factory</span>
+      <span class="badge">Half-Agent Loop</span>
+      <span class="badge">AI-Native Ingest Generator</span>
+      <span class="badge">Northbound MCP</span>
+      <span class="badge">Zero-Dependency Edge Inference</span>
+      <span class="badge">Multi-tenant SaaS</span>
+    </div>
+  </div>
+
+  <nav class="toc">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#s1">Abstract</a></li>
+      <li><a href="#s2">Background &amp; Industry Challenges</a></li>
+      <li><a href="#s3">Positioning &amp; Design Philosophy</a></li>
+      <li><a href="#s4">Overall Architecture</a></li>
+      <li><a href="#s5">Capability 1: Half-Agent Loop</a></li>
+      <li><a href="#s6">Capability 2: AI-Native Ingest Generator</a></li>
+      <li><a href="#s7">Capability 3: Northbound MCP</a></li>
+      <li><a href="#s8">Capability 4: Multi-tenant SaaS</a></li>
+      <li><a href="#s9">Machine Learning Pipeline</a></li>
+      <li><a href="#s10">Data Model Overview</a></li>
+      <li><a href="#s11">Key Technical Decisions</a></li>
+      <li><a href="#s12">Security &amp; Compliance</a></li>
+      <li><a href="#s13">Open Source &amp; Community</a></li>
+      <li><a href="#s14">Roadmap</a></li>
+      <li><a href="#s15">Conclusion</a></li>
+      <li><a href="#app">Appendix: Glossary &amp; Resources</a></li>
+    </ol>
+  </nav>
+
+  <div class="body">
+
+    <section id="s1">
+      <h2 class="sec"><span class="num">01</span>Abstract</h2>
+      <p class="lead">CLMX is a <strong>vertical AI model training, inference &amp; capability-open platform for the industrial internet</strong>. It abstracts the workshop-style task of "training one anomaly-detection model for one device" into a reusable, orchestratable, and externally openable <strong>model factory</strong>.</p>
+      <p>CLMX uses industrial equipment predictive maintenance (PdM) as its first landing shell, yet its base is a general <strong>model production &amp; operation system</strong>: it ships two training-inference-isomorphic engines — unsupervised time-series anomaly detection and a zero-dependency Chinese text classifier — and, toward the goal of making the platform itself somewhat intelligent, delivers a <strong>half-agent closed loop</strong> (natural-language interaction → auto baseline → automated anomaly handling → automated training interpretation).</p>
+      <p>On the ingest side, CLMX introduces an <strong>AI-native ingest generator</strong>: it extracts measurement points from device docs/samples/descriptions, generates a thing model and a zero-dependency collector driver, and self-tests it in place. On the open side, CLMX exposes its APIs as <strong>10 standard tools over a northbound MCP (Model Context Protocol) capability base</strong>, enabling external AI agents to orchestrate CLMX directly. Together these two directions defend the <strong>moat</strong> — <strong>training-inference isomorphism + zero-dependency edge JS inference</strong> — so models run at the edge without any deep-learning framework.</p>
+      <p>This white paper presents CLMX's positioning, architecture, four core capabilities, ML pipeline, key technical decisions, security model, and open-source roadmap for technical decision-makers, integrators, and contributors.</p>
+    </section>
+
+    <section id="s2">
+      <h2 class="sec"><span class="num">02</span>Background &amp; Industry Challenges</h2>
+      <h3>2.1 Pain points of industrial predictive maintenance</h3>
+      <p>Unplanned downtime of industrial equipment is extremely costly. Traditional "scheduled maintenance" either over-services or misses failures. Data-driven PdM is the公认 direction, yet landing it has long been stuck behind four hurdles:</p>
+      <div class="grid c2">
+        <div class="card"><div class="ic">🧩</div><h4>Integration hell</h4><p>Brands, protocols, and point namings vary wildly. Every new device needs a bespoke collector driver and thing model — high effort, error-prone, hard to reuse.</p></div>
+        <div class="card"><div class="ic">🏷️</div><h4>Scarce labels</h4><p>Anomaly samples are rare and expensive. Supervised learning starves on the factory floor before training even begins.</p></div>
+        <div class="card"><div class="ic">🖥️</div><h4>Edge can't run it</h4><p>Deep-learning frameworks are heavy and dependency-laden, hard to deploy on gateways/edge nodes; pushing all inference back to the center adds latency and bandwidth cost.</p></div>
+        <div class="card"><div class="ic">🧱</div><h4>Platform not smart</h4><p>Most tools are just "dashboards + threshold alerts". A human still has to understand, handle, and review every alert — the platform itself is absent from the decision loop.</p></div>
+      </div>
+      <h3>2.2 Three shortcomings of existing solutions</h3>
+      <ul>
+        <li><strong>Biased toward "a single model" rather than "a model production system"</strong>: most PdM offerings deliver one trained model, lacking the ability to productize, repeat, and operate the modeling process.</li>
+        <li><strong>Biased toward "bolting on a chatbot" rather than "opening capabilities"</strong>: equating AI with a chat entry point, without exposing platform capabilities via a standard protocol that external agents can orchestrate.</li>
+        <li><strong>Center-heavy, edge-light</strong>: inference depends on central GPUs/frameworks, leaving the edge as mere passthrough and forfeiting "near-edge intelligence" elasticity.</li>
+      </ul>
+      <div class="callout">CLMX's design starting point is not "a smarter dashboard", but engineering away all four hurdles at once: auto-generated ingestion, label-free training, zero-dependency inference, and a semi-autonomous platform.</div>
+    </section>
+
+    <section id="s3">
+      <h2 class="sec"><span class="num">03</span>Positioning &amp; Design Philosophy</h2>
+      <h3>3.1 What CLMX is: a model factory, not a single model</h3>
+      <p>One frequently confused concept needs clarifying:</p>
+      <table>
+        <tr><th>Concept</th><th>Definition</th><th>CLMX's role</th></tr>
+        <tr><td><strong>Vertical model</strong></td><td>A specific model trained for one scenario (e.g. air-compressor vibration anomaly detection)</td><td>What CLMX <em>produces</em></td></tr>
+        <tr><td><strong>Agent</strong></td><td>An autonomous role that calls models to complete tasks</td><td>CLMX's <em>consumer / orchestrator</em></td></tr>
+        <tr><td><strong>CLMX</strong></td><td>Model factory + inference service + capability-open platform</td><td>The <em>base</em> that trains, hosts, and opens models</td></tr>
+      </table>
+      <p>External tagline: "<strong>A vertical AI model training &amp; inference platform for the industrial internet</strong>". The platform produces vertical models; agents call them — the two are bridged by northbound MCP.</p>
+      <h3>3.2 Core design principles</h3>
+      <div class="grid c3">
+        <div class="card"><h4>Zero-dependency first</h4><p>Implement training and inference in pure JS / stdlib wherever possible, avoiding heavy frameworks so the edge can run and dependencies stay controllable.</p></div>
+        <div class="card"><h4>Train-infer isomorphism</h4><p>Training and inference share the same code and numeric logic, eliminating the "train in Python, ship in another stack" drift and maintenance cost.</p></div>
+        <div class="card"><h4>Multi-tenant isolation</h4><p>Row-level data isolation; every CRUD forcibly carries <code>tenantId</code>; delivered as a platform-as-a-service (SaaS).</p></div>
+      </div>
+      <h3>3.3 HubPort idea fusion</h3>
+      <p>CLMX evaluated the ideas of "HubPort (an AI-native IoT platform)" and concluded: <strong>fuse the ideas, not the product</strong>. It adopts four core ideas and is explicit about what it does not copy:</p>
+      <table>
+        <tr><th>Idea</th><th>Adoption (in CLMX)</th></tr>
+        <tr><td>T1 · AI-native ingest</td><td>Ingest generator: doc/description → auto thing model + collector driver + self-test</td></tr>
+        <tr><td>T2 · AI at create, zero-AI at runtime</td><td>Driver generated by AI/heuristics at <em>create</em> time, executed as pure zero-dep JS at <em>runtime</em> (same moat)</td></tr>
+        <tr><td>T3 · Capability assetization</td><td>IngestSpec / IngestAsset models + publish marketplace + one-click reuse (reuseCount)</td></tr>
+        <tr><td>T4 · Northbound openness</td><td>Self-implemented MCP base wrapping platform APIs into 10 standard tools for external agents</td></tr>
+      </table>
+      <div class="callout warn"><b>Red line:</b> "AI-native ≠ bolting on a chatbot". CLMX does not copy HubPort's product breadth (680+ features / full-stack IoT), multi-language runtime (keeps zero-dep JS), or controlled CLI shell access (chooses the MCP standard instead).</div>
+    </section>
+
+    <section id="s4">
+      <h2 class="sec"><span class="num">04</span>Overall Architecture</h2>
+      <p>CLMX uses a clean front-end/back-end separated, layered service architecture. The back end serves via Express + Prisma; the front end is React + TypeScript + Tailwind. The ingest layer supports both MQTT (aedes) and the AI-native ingest endpoint; the model layer uses a Python worker (CPU mode) for training, while inference sinks to zero-dependency JS.</p>
+      <div class="fig">
+        <svg viewBox="0 0 820 430" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, sans-serif">
+          <defs><marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#7c93b3"/></marker></defs>
+          <rect x="20" y="20" width="780" height="64" rx="10" fill="#0a1f45"/>
+          <text x="40" y="48" fill="#cfe0f5" font-size="14" font-weight="700">Presentation / Interaction Layer</text>
+          <text x="40" y="70" fill="#9fd6e0" font-size="12.5">React + TS + Tailwind console · NL interaction entry · Asset marketplace UI · "Ingest Generator" sidebar</text>
+          <rect x="20" y="98" width="780" height="74" rx="10" fill="#10316b"/>
+          <text x="40" y="124" fill="#fff" font-size="14" font-weight="700">Platform Service Layer (Express + Prisma + PostgreSQL)</text>
+          <text x="40" y="146" fill="#bcd0ea" font-size="12.5">Auth/RBAC · Device/Model/Training/Alert domains · Half-agent orchestration · Multi-tenant row isolation · Northbound MCP (JSON-RPC, zero-dep)</text>
+          <rect x="20" y="186" width="780" height="70" rx="10" fill="#0a6f7e"/>
+          <text x="40" y="212" fill="#fff" font-size="14" font-weight="700">Ingest &amp; Generation Layer</text>
+          <text x="40" y="234" fill="#d7f3f7" font-size="12.5">MQTT/aedes telemetry · AI-native ingest generator (point extract → thing model → zero-dep driver → sandbox self-test) · runtime collect → SensorData</text>
+          <rect x="20" y="270" width="780" height="64" rx="10" fill="#3a4a63"/>
+          <text x="40" y="296" fill="#fff" font-size="14" font-weight="700">Model Layer</text>
+          <text x="40" y="318" fill="#d4dceb" font-size="12.5">Python worker (child_process, CPU) training · Unsupervised anomaly detection · Zero-dep Naive Bayes NLP · train-infer isomorphism</text>
+          <rect x="20" y="348" width="780" height="58" rx="10" fill="#1b9e6b"/>
+          <text x="40" y="374" fill="#fff" font-size="14" font-weight="700">Data &amp; Edge Layer</text>
+          <text x="40" y="396" fill="#d3f3e3" font-size="12.5">PostgreSQL (prod) / SQLite (dev) · Edge zero-dep JS inference · Health &lt; 60 auto-pushes alert</text>
+          <line x1="410" y1="84" x2="410" y2="98" stroke="#7c93b3" stroke-width="2" marker-end="url(#ar)"/>
+          <line x1="410" y1="172" x2="410" y2="186" stroke="#7c93b3" stroke-width="2" marker-end="url(#ar)"/>
+          <line x1="410" y1="256" x2="410" y2="270" stroke="#7c93b3" stroke-width="2" marker-end="url(#ar)"/>
+          <line x1="410" y1="334" x2="410" y2="348" stroke="#7c93b3" stroke-width="2" marker-end="url(#ar)"/>
+          <text x="690" y="92" fill="#5d7290" font-size="11.5">request downstream</text>
+          <text x="690" y="280" fill="#5d7290" font-size="11.5">data/event upstream</text>
+        </svg>
+        <div class="cap">Figure 1 · CLMX layered architecture (top-down: interaction → platform → ingest → model → data/edge)</div>
+      </div>
+      <h3>4.1 Tech stack</h3>
+      <table>
+        <tr><th>Layer</th><th>Choice</th><th>Notes</th></tr>
+        <tr><td>Frontend</td><td>React + TypeScript + Tailwind + Vite</td><td>Console, asset market, ingest UI; unified API unwrap in <code>client/src/api</code></td></tr>
+        <tr><td>Backend</td><td>Express + Prisma</td><td>Modular <code>server/src/modules/&lt;name&gt;</code>; response <code>{success,data,message}</code></td></tr>
+        <tr><td>Database</td><td>PostgreSQL (prod) / SQLite (dev)</td><td>Zero-dep in dev, PG in prod; Json fields stored as String</td></tr>
+        <tr><td>Ingest</td><td>MQTT (aedes) / HTTP telemetry / ingest endpoint</td><td><code>/api/ingest</code> coexists with <code>/telemetry</code></td></tr>
+        <tr><td>Training</td><td>Python worker (child_process, CPU)</td><td>Unsupervised anomaly detection; no deep-learning framework</td></tr>
+        <tr><td>Inference</td><td>Zero-dependency JavaScript</td><td>Runs at edge; train-infer isomorphic</td></tr>
+        <tr><td>Open</td><td>Self-implemented MCP (JSON-RPC 2.0 over NDJSON)</td><td>stdio transport, logs to stderr, no third-party SDK</td></tr>
+      </table>
+      <div class="stat">
+        <div class="s"><div class="n">10</div><div class="l">MCP tools</div></div>
+        <div class="s"><div class="n">0</div><div class="l">inference framework deps</div></div>
+        <div class="s"><div class="n">7</div><div class="l">stages (0–7)</div></div>
+        <div class="s"><div class="n">2</div><div class="l">built-in ML engines</div></div>
+      </div>
+    </section>
+
+    <section id="s5">
+      <h2 class="sec"><span class="num">05</span>Capability 1: Half-Agent Closed Loop</h2>
+      <p>CLMX targets its own intelligence maturity at <strong>stage 3, the "half-agent"</strong>: a perceive-decide-act closed loop, but not a fully autonomous agent (which would conflict with the zero-dep edge base). Four capabilities cooperate into a loop:</p>
+      <div class="fig">
+        <svg viewBox="0 0 760 230" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, sans-serif">
+          <defs><marker id="ar2" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1657d6"/></marker></defs>
+          <rect x="20" y="80" width="160" height="70" rx="10" fill="#1657d6"/>
+          <text x="100" y="112" fill="#fff" font-size="13.5" font-weight="700" text-anchor="middle">Natural Language</text>
+          <text x="100" y="132" fill="#cfe0f5" font-size="11.5" text-anchor="middle">interaction</text>
+          <rect x="210" y="80" width="160" height="70" rx="10" fill="#0aa6b8"/>
+          <text x="290" y="112" fill="#fff" font-size="13.5" font-weight="700" text-anchor="middle">Auto Baseline</text>
+          <text x="290" y="132" fill="#d7f3f7" font-size="11.5" text-anchor="middle">health score/threshold</text>
+          <rect x="400" y="80" width="160" height="70" rx="10" fill="#ff8a3d"/>
+          <text x="480" y="112" fill="#fff" font-size="13.5" font-weight="700" text-anchor="middle">Anomaly Handle</text>
+          <text x="480" y="132" fill="#fff1e6" font-size="11.5" text-anchor="middle">loop (core)</text>
+          <rect x="590" y="80" width="150" height="70" rx="10" fill="#1b9e6b"/>
+          <text x="665" y="112" fill="#fff" font-size="13.5" font-weight="700" text-anchor="middle">Training</text>
+          <text x="665" y="132" fill="#d3f3e3" font-size="11.5" text-anchor="middle">interpretation</text>
+          <line x1="180" y1="115" x2="208" y2="115" stroke="#1657d6" stroke-width="2.5" marker-end="url(#ar2)"/>
+          <line x1="370" y1="115" x2="398" y2="115" stroke="#0aa6b8" stroke-width="2.5" marker-end="url(#ar2)"/>
+          <line x1="560" y1="115" x2="588" y2="115" stroke="#ff8a3d" stroke-width="2.5" marker-end="url(#ar2)"/>
+          <path d="M665 80 C 700 30, 60 30, 100 80" fill="none" stroke="#1b9e6b" stroke-width="2.5" marker-end="url(#ar2)"/>
+          <text x="380" y="205" fill="#5d7290" font-size="12" text-anchor="middle">Loop: interpretation feeds baseline strategy back, continuously self-adapting</text>
+        </svg>
+        <div class="cap">Figure 2 · Half-agent loop: NL entry → auto baseline → anomaly handling (core) → training interpretation</div>
+      </div>
+      <h4>① Natural-language interaction entry</h4>
+      <p>Upgrades "dashboard operations" to "language operations". Users describe intent in Chinese (e.g. "generate last week's health score for cooling pump #1"); the platform parses and invokes the corresponding capability. This entry is also exposed northbound as <code>clmx_nl_command</code> for external agents.</p>
+      <h4>② Auto baseline &amp; health score</h4>
+      <p>The platform auto-computes baselines and health scores per point from history; alert thresholds are no longer hand-guessed. When health &lt; 60, Notification + AlertChannel auto-push, no manual watching needed.</p>
+      <h4>③ Automated anomaly handling loop (core)</h4>
+      <p>On detecting an anomaly, the platform can auto-trigger an action chain (notify, dispatch, linkage, and if needed re-training), forming a "perceive-decide-act" loop. This is what separates CLMX from "dashboard + threshold".</p>
+      <h4>④ Automated training interpretation</h4>
+      <p>After training/inference, the platform auto-produces a readable interpretation (metrics, anomaly intervals, suggestions), lowering the barrier and making the loop explainable and auditable.</p>
+      <div class="callout ok">The half-agent does not pursue "full autonomy". It runs the loop within human-set boundaries — handing repetitive, programmable decisions to the platform while leaving value judgments to users. That is exactly the controllable intelligence industrial scenarios need.</div>
+    </section>
+
+    <section id="s6">
+      <h2 class="sec"><span class="num">06</span>Capability 2: AI-Native Ingest Generator</h2>
+      <h3>6.1 Pain point: integration hell</h3>
+      <p>On the factory floor, every new device needs a hand-written collector driver, a thing model, and point-name alignment. CLMX's ingest generator automates this:</p>
+      <div class="fig">
+        <svg viewBox="0 0 800 120" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, sans-serif">
+          <defs><marker id="ar3" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#0aa6b8"/></marker></defs>
+          <rect x="10" y="40" width="120" height="48" rx="8" fill="#10316b"/><text x="70" y="69" fill="#fff" font-size="11.5" text-anchor="middle">Docs/Samples/Desc</text>
+          <rect x="160" y="40" width="120" height="48" rx="8" fill="#0aa6b8"/><text x="220" y="69" fill="#fff" font-size="11.5" text-anchor="middle">Point Extract</text>
+          <rect x="310" y="40" width="120" height="48" rx="8" fill="#0aa6b8"/><text x="370" y="69" fill="#fff" font-size="11.5" text-anchor="middle">Thing Model</text>
+          <rect x="460" y="40" width="120" height="48" rx="8" fill="#0aa6b8"/><text x="520" y="69" fill="#fff" font-size="11.5" text-anchor="middle">Zero-dep Driver</text>
+          <rect x="610" y="40" width="120" height="48" rx="8" fill="#1b9e6b"/><text x="670" y="69" fill="#fff" font-size="11.5" text-anchor="middle">Self-test→Run</text>
+          <line x1="130" y1="64" x2="158" y2="64" stroke="#0aa6b8" stroke-width="2.5" marker-end="url(#ar3)"/>
+          <line x1="280" y1="64" x2="308" y2="64" stroke="#0aa6b8" stroke-width="2.5" marker-end="url(#ar3)"/>
+          <line x1="430" y1="64" x2="458" y2="64" stroke="#0aa6b8" stroke-width="2.5" marker-end="url(#ar3)"/>
+          <line x1="580" y1="64" x2="608" y2="64" stroke="#1b9e6b" stroke-width="2.5" marker-end="url(#ar3)"/>
+        </svg>
+        <div class="cap">Figure 3 · Ingest generator pipeline: from unstructured input to runnable, reusable asset</div>
+      </div>
+      <h3>6.2 Point-extraction priority</h3>
+      <p>The generator tries in descending confidence, stopping at first hit:</p>
+      <ol>
+        <li><strong>Structured JSON</strong>: parse point definitions directly;</li>
+        <li><strong>Sample inference</strong>: reverse-infer point types/units from collected samples;</li>
+        <li><strong>Heuristic dictionary from description</strong>: extract via a Chinese industrial lexicon ("temperature/pressure/vibration/rpm/current");</li>
+        <li><strong>Optional LLM (env-gated)</strong>: used only when an LLM key is configured; no npm dependency, pure HTTP call.</li>
+      </ol>
+      <h3>6.3 Thing model &amp; zero-dependency driver</h3>
+      <p>After extracting points, a standard <strong>thing model</strong> and a zero-dependency JS collector driver <code>collect(ctx)</code> are generated. The driver is generated by AI/heuristics at <em>create</em> time and runs as pure JS at <em>runtime</em> — exactly HubPort T2: AI at create, zero-AI at runtime.</p>
+      <h3>6.4 Sandbox self-test &amp; runtime</h3>
+      <p>After generation, the driver is executed in a <code>new Function</code> sandbox to verify it yields finite numeric values; once passed it can be published to the asset marketplace. The runtime endpoint receives the driver and executes it, writing results to <code>SensorData</code>, coexisting with the MQTT telemetry endpoint under <code>/api/ingest</code>.</p>
+      <h4>Snippet: generated collector driver</h4>
+      <pre><code><span class="c-com">// produced by the ingest generator (zero-dep, pure JS at runtime)</span>
+<span class="c-key">function</span> <span class="c-fn">collect</span>(ctx) {
+  <span class="c-key">const</span> t = Date.now();
+  <span class="c-key">return</span> [
+    { point: <span class="c-str">'temperature'</span>, value: <span class="c-fn">sim</span>(ctx, <span class="c-str">'temperature'</span>, 65, 8), ts: t },
+    { point: <span class="c-str">'vibration'</span>,  value: <span class="c-fn">sim</span>(ctx, <span class="c-str">'vibration'</span>,  2.3, 0.6), ts: t },
+    { point: <span class="c-str">'current'</span>,    value: <span class="c-fn">sim</span>(ctx, <span class="c-str">'current'</span>,   12, 1.5), ts: t }
+  ];
+}</code></pre>
+      <div class="callout">Assetization: results are persisted as <code>IngestSpec</code> (requirement draft) / <code>IngestAsset</code> (version chain, <code>unique(specId, version)</code>, with <code>published</code>, <code>reuseCount</code>, <code>driverCode</code>, <code>thingModel</code>). A one-click <code>apply</code> auto-creates sensors for a device and puts it into operation.</div>
+    </section>
+
+    <section id="s7">
+      <h2 class="sec"><span class="num">07</span>Capability 3: Northbound MCP Capability Exposure</h2>
+      <h3>7.1 Why MCP</h3>
+      <p>The platform's real value lies in "being used". CLMX chooses <strong>MCP (Model Context Protocol)</strong> as the northbound open standard instead of a self-built CLI shell — external AI agents can orchestrate CLMX capabilities directly, upgrading the platform from "clicked" to "orchestrated".</p>
+      <h3>7.2 Zero-dependency JSON-RPC implementation</h3>
+      <p>The MCP service self-implements <strong>JSON-RPC 2.0 over NDJSON</strong> (no official SDK), stdio transport, logs to stderr to avoid polluting the protocol stream. Auth supports <code>CLMX_API_TOKEN</code> passthrough or <code>CLMX_API_EMAIL/PASSWORD</code> auto-login. Exit logic waits for in-flight requests after stdin closes, so no request is dropped.</p>
+      <h4>Snippet: MCP tool registry (excerpt)</h4>
+      <pre><code><span class="c-com">// server/src/modules/mcp/tools.ts</span>
+<span class="c-key">export const</span> TOOLS = [
+  { name: <span class="c-str">'clmx_nl_command'</span>,       desc: <span class="c-str">'Natural-language command entry'</span> },
+  { name: <span class="c-str">'clmx_list_devices'</span>,     desc: <span class="c-str">'List devices'</span> },
+  { name: <span class="c-str">'clmx_device_detail'</span>,   desc: <span class="c-str">'Device detail'</span> },
+  { name: <span class="c-str">'clmx_health_dashboard'</span>,desc: <span class="c-str">'Health dashboard'</span> },
+  { name: <span class="c-str">'clmx_calculate_health'</span>,desc: <span class="c-str">'Compute health score'</span>, role: <span class="c-str">'MANAGER'</span> },
+  { name: <span class="c-str">'clmx_list_training'</span>,   desc: <span class="c-str">'List training jobs'</span> },
+  { name: <span class="c-str">'clmx_trigger_training'</span>,desc:<span class="c-str">'Trigger training'</span>, role: <span class="c-str">'MANAGER'</span> },
+  { name: <span class="c-str">'clmx_run_inference'</span>,   desc: <span class="c-str">'Run inference'</span>, role: <span class="c-str">'MANAGER'</span> },
+  { name: <span class="c-str">'clmx_keywords'</span>,        desc: <span class="c-str">'Chinese keyword extraction'</span> },
+  { name: <span class="c-str">'clmx_list_alert_rules'</span>,desc:<span class="c-str">'List alert rules'</span> },
+];</code></pre>
+      <h3>7.3 The 10 tools</h3>
+      <table>
+        <tr><th>Tool</th><th>Capability</th><th>Role</th></tr>
+        <tr><td><code>clmx_nl_command</code></td><td>Unified NL command entry</td><td>any</td></tr>
+        <tr><td><code>clmx_list_devices</code></td><td>List tenant devices</td><td>any</td></tr>
+        <tr><td><code>clmx_device_detail</code></td><td>Single device detail &amp; points</td><td>any</td></tr>
+        <tr><td><code>clmx_health_dashboard</code></td><td>Device health overview</td><td>any</td></tr>
+        <tr><td><code>clmx_calculate_health</code></td><td>On-demand health score</td><td>MANAGER</td></tr>
+        <tr><td><code>clmx_list_training</code></td><td>Training job list</td><td>any</td></tr>
+        <tr><td><code>clmx_trigger_training</code></td><td>Trigger model training</td><td>MANAGER</td></tr>
+        <tr><td><code>clmx_run_inference</code></td><td>Run model inference</td><td>MANAGER</td></tr>
+        <tr><td><code>clmx_keywords</code></td><td>CN keyword / text classification</td><td>any</td></tr>
+        <tr><td><code>clmx_list_alert_rules</code></td><td>Alert rule query</td><td>any</td></tr>
+      </table>
+      <h4>Call example (initialize → list devices)</h4>
+      <pre><code><span class="c-com"># stdin (NDJSON, one JSON-RPC request per line)</span>
+{<span class="c-str">"jsonrpc"</span>:<span class="c-str">"2.0"</span>,<span class="c-str">"id"</span>:1,<span class="c-str">"method"</span>:<span class="c-str">"initialize"</span>,<span class="c-str">"params"</span>:{<span class="c-str">"protocolVersion"</span>:<span class="c-str">"2024-11-05"</span>,<span class="c-str">"capabilities"</span>:{}}}
+{<span class="c-str">"jsonrpc"</span>:<span class="c-str">"2.0"</span>,<span class="c-str">"id"</span>:2,<span class="c-str">"method"</span>:<span class="c-str">"tools/call"</span>,<span class="c-str">"params"</span>:{<span class="c-str">"name"</span>:<span class="c-str">"clmx_list_devices"</span>,<span class="c-str">"arguments"</span>:{}}}</code></pre>
+      <p>The protocol layer has passed <code>tsc</code> type-checking and protocol smoke tests.</p>
+    </section>
+
+    <section id="s8">
+      <h2 class="sec"><span class="num">08</span>Capability 4: Multi-tenant SaaS Foundation</h2>
+      <p>CLMX is delivered as a service; all data is isolated per tenant.</p>
+      <h4>Row-level isolation (an inviolable constraint)</h4>
+      <ul>
+        <li>Every CRUD <code>where</code> must include <code>tenantId: req.tenantId</code>;</li>
+        <li>When operating sub-resources, the parent is first queried to verify ownership, preventing escalation;</li>
+        <li><code>req.tenantId</code> / <code>req.userRole</code> are injected from the JWT by <code>authMiddleware</code>;</li>
+        <li>Preset data uses <code>tenantId: null</code>; queries use <code>OR [tenantId=?, tenantId=null]</code> for compatibility.</li>
+      </ul>
+      <h4>Value-added capabilities</h4>
+      <p>Since stage 4, quota, billing, and white-label SaaS value-adds exist, so the platform can self-operate and also serve as a base for integrators to redistribute.</p>
+      <div class="callout">Isolation is the first line of security. CLMX makes <code>tenantId</code> filtering a route-layer enforced convention (not a business-code discipline), architecturally eliminating the "forgot the condition → cross-tenant leak" hazard.</div>
+    </section>
+
+    <section id="s9">
+      <h2 class="sec"><span class="num">09</span>Machine Learning Pipeline</h2>
+      <h3>9.1 Unsupervised anomaly detection</h3>
+      <p>Uses <strong>Autoencoder / Isolation Forest</strong> and other unsupervised methods to learn the distribution from normal-condition data and score deviations — <strong>label-free</strong>, directly answering the "scarce labels" reality so it can go live without anomaly samples.</p>
+      <h3>9.2 Zero-dependency Chinese text classification</h3>
+      <p>For Chinese text such as work orders and logs, a <strong>Naive Bayes</strong> implementation is used — <strong>train-infer isomorphic, pure JS</strong>, with no NLP framework. The keyword tool <code>clmx_keywords</code> exposes this capability externally.</p>
+      <h3>9.3 Train-infer isomorphism &amp; edge JS inference</h3>
+      <p>Training (Python worker for heavy fitting) and inference (zero-dep JS) share the same numeric logic. The inference side introduces no deep-learning framework, so it <strong>runs directly at the edge node</strong> — "near-edge intelligence" — a core moat of CLMX.</p>
+      <h3>9.4 Alert delivery</h3>
+      <p>Notification + AlertChannel are live: when health &lt; 60 it auto-pushes and can be routed per channel (e.g. WeCom, Webhook). An alert is not an endpoint but the trigger of the "half-agent loop".</p>
+    </section>
+
+    <section id="s10">
+      <h2 class="sec"><span class="num">10</span>Data Model Overview</h2>
+      <p>Core entities (Prisma models) cover devices, models, training, ingest assets, and the multi-tenant boundary:</p>
+      <table>
+        <tr><th>Model</th><th>Responsibility</th></tr>
+        <tr><td><code>Device</code> / <code>Sensor</code> / <code>SensorData</code></td><td>Device, measurement point, time-series data</td></tr>
+        <tr><td><code>AiModel</code> / <code>Dataset</code> / <code>DataVersion</code></td><td>Model, dataset and its versions</td></tr>
+        <tr><td><code>TrainingJob</code> / <code>ModelVersion</code> / <code>TrainingLog</code></td><td>Training job, model version, training logs</td></tr>
+        <tr><td><code>IngestSpec</code> / <code>IngestAsset</code></td><td>Ingest requirement draft / versioned ingest asset (driverCode, thingModel, reuseCount)</td></tr>
+        <tr><td><code>AlertRule</code> / <code>Notification</code> / <code>AlertChannel</code></td><td>Alert rules, notifications, channels</td></tr>
+        <tr><td>Tenant / User / Role</td><td>Multi-tenancy &amp; RBAC</td></tr>
+      </table>
+      <div class="callout warn">Deletion order (FK constraints): <code>TrainingLog → ModelVersion → TrainingJob → DataVersion → Dataset → AiModel → Device</code>. Always delete from the deepest child first to avoid FK conflicts.</div>
+    </section>
+
+    <section id="s11">
+      <h2 class="sec"><span class="num">11</span>Key Technical Decisions</h2>
+      <table>
+        <tr><th>Decision</th><th>Trade-off</th><th>Reason</th></tr>
+        <tr><td>BigInt patch (top of server.ts)</td><td>Keep a "seemingly redundant" patch</td><td>SQLite/Prisma BigInt serialization is missing; removing it causes login 500. Do not delete.</td></tr>
+        <tr><td>PG Json field as String</td><td>Give up native Json type</td><td>App-layer manual serialization avoids driver differences, keeps cross-DB consistency</td></tr>
+        <tr><td>SSE auth via <code>?token=</code></td><td>No JWT in header</td><td>EventSource cannot set custom headers; token rides the URL query</td></tr>
+        <tr><td>Seed by code upsert</td><td>No "skip if data exists"</td><td>Ensure preset data is repeatable and idempotent</td></tr>
+        <tr><td>Training via Python worker</td><td>Introduce child_process, not pure-JS training</td><td>Heavy fitting uses Python ecosystem; inference returns to zero-dep JS (isomorphic)</td></tr>
+        <tr><td>MCP self-implemented, zero-dep</td><td>No official SDK</td><td>Keeps "zero-dep edge" consistency, shrinks attack surface and size</td></tr>
+      </table>
+    </section>
+
+    <section id="s12">
+      <h2 class="sec"><span class="num">12</span>Security &amp; Compliance</h2>
+      <ul>
+        <li><strong>Auth &amp; authorization</strong>: JWT + Bearer + RBAC (4 levels, incl. MANAGER); sensitive ops (compute health, trigger training, run inference) are role-gated.</li>
+        <li><strong>Multi-tenant isolation</strong>: architectural <code>tenantId</code> enforced filtering (see §8).</li>
+        <li><strong>Secret management</strong>: real <code>.env</code> and secrets never enter git history; <code>.gitignore</code> isolates <code>.env</code> / <code>*.db</code> / secrets / <code>.workbuddy</code>; deploy passwords come via env vars (e.g. <code>CLMX_SSH_PASS</code>), never in repo.</li>
+        <li><strong>Vulnerability disclosure</strong>: <code>SECURITY.md</code> provides a private reporting channel to avoid premature public exposure.</li>
+        <li><strong>Dependency security</strong>: <code>dependabot.yml</code> weekly auto-updates for front/back npm, Python, and github-actions.</li>
+      </ul>
+      <div class="callout ok">Open-source security audit conclusion: no real secrets leaked in history; published files (LICENSE/README/community health files) were audited before入库.</div>
+    </section>
+
+    <section id="s13">
+      <h2 class="sec"><span class="num">13</span>Open Source &amp; Community</h2>
+      <p>CLMX is open source under MIT and follows "proper open-source project" practice; Community Profile coverage is 100%:</p>
+      <div class="grid c3">
+        <div class="card"><h4>Basics</h4><p>README · MIT LICENSE · CHANGELOG</p></div>
+        <div class="card"><h4>Collaboration</h4><p>CONTRIBUTING · CODE_OF_CONDUCT · CODEOWNERS · PR template</p></div>
+        <div class="card"><h4>Governance</h4><p>SECURITY · SUPPORT · Issue templates · dependabot</p></div>
+        <div class="card"><h4>Planning</h4><p>ROADMAP · Discussions (welcome post live)</p></div>
+        <div class="card"><h4>Visibility</h4><p>14 Topics · Good first issue</p></div>
+        <div class="card"><h4>Two repos</h4><p>GitHub (public) · Gitee (open source) synced</p></div>
+      </div>
+      <p>Repository URLs:<br>
+        · GitHub: <a href="https://github.com/iduyuhe/clmx" target="_blank">https://github.com/iduyuhe/clmx</a><br>
+        · Gitee: <a href="https://gitee.com/i4hub/clmx" target="_blank">https://gitee.com/i4hub/clmx</a></p>
+      <p>Default demo account <code>test@test.com / 123456</code> (ADMIN) is for local demo only; change the password immediately in production and close the public demo entry.</p>
+    </section>
+
+    <section id="s14">
+      <h2 class="sec"><span class="num">14</span>Roadmap</h2>
+      <table>
+        <tr><th>Stage</th><th>Content</th><th>Status</th></tr>
+        <tr><td>Stage 0</td><td>Rule engine (business validation)</td><td>✅ Done</td></tr>
+        <tr><td>Stage 1</td><td>Data accumulation</td><td>✅ Done</td></tr>
+        <tr><td>Stage 2</td><td>Industrial time-series ML pipeline (T1)</td><td>✅ Done</td></tr>
+        <tr><td>Stage 3</td><td>SaaS-ification (row isolation + PG)</td><td>✅ Done</td></tr>
+        <tr><td>Stage 4</td><td>Value-add (quota/billing/white-label) + Gitee入库 + real device ingest (MQTT)</td><td>✅ Done</td></tr>
+        <tr><td>Stage 5</td><td>AI-native ingest generator (HubPort T1/T2)</td><td>✅ Done</td></tr>
+        <tr><td>Stage 6</td><td>Northbound MCP capability base (HubPort T4)</td><td>✅ Done</td></tr>
+        <tr><td>Stage 7</td><td>Capability assetization governance (HubPort T3)</td><td>✅ Done</td></tr>
+      </table>
+      <p><strong>Planned directions (inspired by HubPort ideas):</strong> deepen the autonomy boundary of the half-agent loop, extend the ingest generator to more protocols/doc formats, enrich the MCP tool set, and build the asset-market ecosystem with cross-tenant reuse incentives.</p>
+    </section>
+
+    <section id="s15">
+      <h2 class="sec"><span class="num">15</span>Conclusion</h2>
+      <p>CLMX is not another "smarter dashboard". It upgrades industrial AI from "train one model" to "operate a model factory" — using an AI-native ingest generator to absorb integration cost, zero-dependency edge inference to hold the runtime boundary, northbound MCP to open capabilities to external agents, and a half-agent loop to let the platform itself participate in decisions.</p>
+      <p>We open-source the whole platform under MIT — a commitment to "industrial-internet AI for all", and an invitation to build ingest templates, model algorithms, and the asset market together. The door of the model factory is open.</p>
+      <div class="callout"><b>How to participate:</b> ① File Issues &amp; PRs on GitHub/Gitee; ② Contribute device templates to the asset market via the ingest generator; ③ Build your industrial agent on the MCP tools; ④ Share your landing practice in Discussions.</div>
+    </section>
+
+    <section id="app">
+      <h2 class="sec"><span class="num">App</span>Glossary &amp; Resources</h2>
+      <h4>Glossary</h4>
+      <table>
+        <tr><th>Term</th><th>Meaning</th></tr>
+        <tr><td>Vertical model</td><td>A model trained for one specific industrial scenario (CLMX's output)</td></tr>
+        <tr><td>Half-agent</td><td>A controllable intelligence with perceive-decide-act loop, running within human-set boundaries (stage 3)</td></tr>
+        <tr><td>Train-infer isomorphism</td><td>Training and inference share the same code and numeric logic</td></tr>
+        <tr><td>Ingest generator</td><td>Auto-generates thing model and zero-dep collector driver from docs/samples/description</td></tr>
+        <tr><td>MCP</td><td>Model Context Protocol, the northbound capability-open standard</td></tr>
+        <tr><td>Thing model</td><td>Abstract description of a device's points and their types/units</td></tr>
+        <tr><td>Asset market</td><td>Publish &amp; reuse platform for ingest assets (IngestAsset)</td></tr>
+      </table>
+      <h4>Resources</h4>
+      <ul>
+        <li>GitHub: <a href="https://github.com/iduyuhe/clmx" target="_blank">https://github.com/iduyuhe/clmx</a></li>
+        <li>Gitee: <a href="https://gitee.com/i4hub/clmx" target="_blank">https://gitee.com/i4hub/clmx</a></li>
+        <li>README / CONTRIBUTING / SECURITY / ROADMAP: repo root &amp; <code>docs/</code></li>
+        <li>Marketing assets: <code>docs/CLMX宣传手册.html</code> · <code>docs/CLMX开源发布.pptx</code> · <code>docs/CLMX技术白皮书.html</code> (中文)</li>
+      </ul>
+      <p style="color:var(--muted);font-size:13px;margin-top:24px">© 2026 CLMX Authors · This white paper is released under the MIT license alongside the repository; free to cite and redistribute, please retain attribution.</p>
+    </section>
+
+  </div>
+
+  <footer>
+    CLMX Technical White Paper v1.0 · Vertical AI model training, inference &amp; capability-open platform for the industrial internet ·
+    <a href="https://github.com/iduyuhe/clmx" target="_blank">GitHub</a> /
+    <a href="https://gitee.com/i4hub/clmx" target="_blank">Gitee</a> ·
+    MIT License
+  </footer>
+
+</div>
+</body>
+</html>
